@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasmasjid V4.4 Online Reporting - Secure</title>
+    <title>Kasmasjid V4.5 Cloud Firebase - Secure</title>
     <!-- PWA settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063185.png">
     <meta name="theme-color" content="#f3f4f6">
     
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=700&family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -94,10 +94,8 @@
         .view-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- DASHBOARD CARDS LEBIH MEWAH --- */
-        .dashboard-main-balances { display: flex; overflow-x: auto; gap: 15px; margin-bottom: 25px; padding-bottom: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
-        .dashboard-main-balances::-webkit-scrollbar { display: none; }
-        .dashboard-main-balances .account-card { min-width: 85%; scroll-snap-align: center; flex-shrink: 0; }
+        /* --- DASHBOARD CARDS ELEGAN TERSUSUN KE BAWAH --- */
+        .dashboard-main-balances { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: 25px; }
         .dashboard-activity-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         
         .account-card { border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.15); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; color: white; border: 1px solid rgba(255,255,255,0.2); }
@@ -169,25 +167,25 @@
             #tbody-latest td:nth-child(4), #tbody-audit td:nth-child(4) { display: none !important; }
             #tbody-latest td:nth-child(5), #tbody-audit td:nth-child(5) { width: auto !important; position: absolute; right: 18px; top: 18px; font-size: 15px; font-weight: 800; order: 99; }
 
-            #tbody-bukukas tr { align-items: flex-start; padding: 15px; border-radius: 14px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+            #tbody-bukukas tr { align-items: flex-start; }
+            #tbody-bukukas td:nth-child(2) { font-size: 15px; font-weight: 800; order: 1; margin-bottom: 10px; color: var(--slate-dark); } 
+            #tbody-bukukas td:nth-child(1) { font-size: 12px; color: var(--slate-muted); order: 2; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0 !important; padding-bottom: 12px !important; font-weight: 600; } 
             #tbody-bukukas td.col-rekening { display: none !important; }
-            #tbody-bukukas td:nth-child(2) { font-size: 14px; font-weight: 800; order: 1; color: var(--slate-dark); margin-bottom: 2px !important; width: 65% !important; } 
-            #tbody-bukukas td:nth-child(1) { font-size: 11px; color: var(--slate-muted); order: 2; margin-bottom: 12px !important; border-bottom: none !important; padding-bottom: 0 !important; width: 100% !important; } 
-            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 13px; font-weight: 800; color: #10b981; } 
-            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 13px; font-weight: 800; color: #ef4444; text-align: left; } 
-            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px;}
-            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px;}
-            #tbody-bukukas td:nth-child(6) { position: absolute; right: 15px; top: 15px; background: transparent; padding: 0 !important; text-align: right; font-weight: 800; font-size: 14px; color: var(--islamic-green-deep); border: none; width: auto !important; } 
-            #tbody-bukukas td:nth-child(6)::before { content: 'Saldo'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px; text-align: right;}
-            #tbody-bukukas td:nth-child(7) { order: 6; width: 100% !important; margin-top: 12px; border-top: 1px dashed #e2e8f0; padding-top: 12px !important; display: flex; gap: 8px; } 
+            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 14px; font-weight: 800; color: #10b981; } 
+            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 14px; font-weight: 800; color: #ef4444; text-align: right; } 
+            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(6) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
+            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 10px; } 
             
-            .btn-sm { padding: 10px; border-radius: 8px; font-size: 12px; border: none; color: white; cursor: pointer; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
+            .btn-sm { padding: 12px; border-radius: 12px; border: none; color: white; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
             .bg-red { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; } 
             .bg-blue { background: #f0f9ff; color: #0ea5e9; border: 1px solid #bae6fd; }
         }
 
         /* =========================================
            PENGATURAN KHUSUS CETAK PDF / KERTAS A4
+           (TIDAK ADA YANG DIUBAH, 100% AMAN)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 15mm; }
@@ -196,11 +194,9 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             
-            /* FIX UNTUK LEBAR KOLOM TABEL YANG RUSAK */
             th.print-only, td.print-only { display: table-cell !important; }
             thead.print-only { display: table-header-group !important; }
 
-            /* Paksa tabel kembali ke sifat alaminya */
             table { display: table !important; width: 100% !important; border-collapse: collapse !important; border: 1px solid black !important; margin-bottom: 20px !important; }
             thead { display: table-header-group !important; }
             tbody { display: table-row-group !important; }
@@ -210,24 +206,20 @@
 
             .workspace-banking-card, .summary-box, .spt-box, .dashboard-activity-balances { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
             
-            /* Kop Surat Cetak */
             .print-header { text-align: center; border-bottom: 4px double black; margin-bottom: 20px; padding-bottom: 15px; }
             .print-header h1 { font-family: 'Cinzel', serif; font-size: 24px; color: black; margin: 0 0 5px 0; }
             .print-header h2 { font-size: 16px; font-weight: bold; margin: 0 0 5px 0; text-transform: uppercase; }
             .print-header p { font-size: 12px; margin: 0; }
 
-            /* Kotak Saldo Cetak */
             .print-saldo-container { display: flex !important; justify-content: space-between !important; margin-bottom: 20px !important; border: 1px solid black !important; padding: 10px !important; }
             .print-saldo-box { text-align: center !important; width: 48%; }
             .print-saldo-box span:first-child { font-size: 11px !important; font-weight: bold !important; text-transform: uppercase !important; display: block !important; }
             .print-saldo-box span:last-child { font-size: 14px !important; font-weight: bold !important; display: block !important; }
 
-            /* SPT Box Cetak */
             .spt-box { border: 1px solid black !important; border-radius: 0 !important; margin-bottom: 15px !important; break-inside: avoid; }
             .spt-box h4 { border-bottom: 1px solid black !important; color: black !important; font-size: 14px !important; margin-bottom: 10px !important; padding-bottom: 5px !important; }
             .spt-row.total { color: black !important; border-top: 1px solid black !important; font-size: 14px !important; }
 
-            /* Tanda Tangan Cetak */
             .print-footer { margin-top: 40px; display: flex !important; justify-content: flex-end !important; page-break-inside: avoid; }
             .print-footer-box { text-align: center; width: 250px; }
             .print-footer-box p { font-size: 12px; margin: 3px 0; color: black; }
@@ -258,7 +250,7 @@
                 <div class="header-icon"><i class="fa fa-mosque"></i></div>
                 <div class="header-text">
                     <h1>Kas Al-Ikhlash</h1>
-                    <p><i class="fa fa-user-shield" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Sekretaris</span></p>
+                    <p><i class="fa fa-cloud" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Cloud Firebase Realtime</span></p>
                 </div>
             </div>
             <div class="header-actions">
@@ -267,7 +259,7 @@
         </div>
         <div class="marquee-container">
             <span class="marquee-text">
-                Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure By A.H.RUKMANA <i class="fa fa-star-and-crescent"></i> Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure By A.H.RUKMANA
+                Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure Firebase Cloud <i class="fa fa-star-and-crescent"></i> Al-Ikhlash Financial Core System
             </span>
         </div>
     </div>
@@ -283,10 +275,8 @@
     <!-- GRUP 2: Scrollable Top Menu -->
     <div class="nav-bar-tools no-print">
         <button class="btn-nav" onclick="switchView('audit')"><i class="fa fa-history"></i> Log Audit</button>
-        <button class="btn-nav" onclick="switchView('online')" style="background: #f0f9ff; color: #0284c7; border-color: #bae6fd;"><i class="fa fa-cloud"></i> Sinkronisasi Cloud</button>
         <button class="btn-nav" onclick="healthCheck()"><i class="fa fa-stethoscope"></i> Cek Sistem</button>
         <input type="text" id="input-operator" class="operator-input" placeholder="Ubah Operator..." oninput="updateOperator()" value="Sekretaris">
-        <button class="btn-nav" onclick="restoreAutoBackup()" style="color: #10b981; border-color: #10b981;"><i class="fa fa-recycle"></i> Auto Backup</button>
         <button class="btn-nav" onclick="backupJSON()"><i class="fa fa-database"></i> Backup Data</button>
         <input type="file" id="file-restore" accept=".json" style="display:none;" onchange="restoreJSON(event)">
         <button class="btn-nav" onclick="document.getElementById('file-restore').click()"><i class="fa fa-upload"></i> Restore File</button>
@@ -294,7 +284,7 @@
 
     <!-- VIEW DASHBOARD -->
     <div id="view-dashboard" class="view-section active no-print">
-        <div class="section-title"><i class="fa fa-wallet"></i> Saldo Kas Terkini</div>
+        <div class="section-title"><i class="fa fa-wallet"></i> Saldo Kas Terkini (Realtime Cloud)</div>
         <div class="dashboard-main-balances">
             <div class="account-card card-umum">
                 <span class="label-text">Saldo Kas Umum</span>
@@ -313,20 +303,20 @@
         <div class="section-title"><i class="fa fa-chart-line"></i> Rekap Bulan Ini (<span id="lbl-bulan-ini"></span>)</div>
         <div class="dashboard-activity-balances">
             <div class="account-card card-activity">
-                <span class="label-text">Pemasukan</span>
+                <span class="label-text">Pemasukan Bulan Ini</span>
                 <h2 class="balance-amount txt-in" id="dash-in">Rp 0</h2>
             </div>
             <div class="account-card card-activity">
-                <span class="label-text">Pengeluaran</span>
+                <span class="label-text">Pengeluaran Bulan Ini</span>
                 <h2 class="balance-amount txt-out" id="dash-out">Rp 0</h2>
             </div>
             <div class="account-card card-activity" style="grid-column: span 2; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
                 <div>
-                    <span class="label-text">Surplus / Defisit</span>
+                    <span class="label-text">Surplus / Defisit Bulanan</span>
                     <h2 class="balance-amount" id="dash-surplus" style="margin-top: 5px;">Rp 0</h2>
                 </div>
                 <div style="text-align: right; background: #f8fafc; padding: 10px 15px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <span class="label-text" style="font-size: 10px;">Total Transaksi</span>
+                    <span class="label-text" style="font-size: 10px;">Total Trx Bulan Ini</span>
                     <h2 class="balance-amount" id="dash-count" style="margin-top: 0; font-size: 20px; color: var(--islamic-green-deep);">0</h2>
                 </div>
             </div>
@@ -337,25 +327,6 @@
             <thead class="print-only"><tr><th>Tanggal</th><th>Rekening</th><th>Uraian</th><th>Jenis</th><th>Nominal</th></tr></thead>
             <tbody id="tbody-latest"></tbody>
         </table>
-    </div>
-
-    <!-- VIEW ONLINE -->
-    <div id="view-online" class="view-section no-print">
-        <div class="section-title"><i class="fa fa-cloud-upload-alt"></i> Status Cloud</div>
-        <div class="sync-dashboard">
-            <div class="sync-card" style="border-left-color: #10b981;"><h3>Status Koneksi</h3><div class="val" id="sync-status">Belum Disetel</div></div>
-            <div class="sync-card" style="border-left-color: #f59e0b;"><h3>Terakhir Sinkron</h3><div class="val" id="sync-time" style="font-size: 14px;">-</div></div>
-            <div class="sync-card" style="border-left-color: #8b5cf6;"><h3>Total Data Terkirim</h3><div class="val" id="sync-count">0</div></div>
-        </div>
-        <div class="workspace-banking-card">
-            <div class="section-title">Konfigurasi API</div>
-            <div class="form-group" style="margin-bottom: 15px;"><label>Google Apps Script URL Endpoint</label><input type="text" id="config-gs-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
-            <div class="form-group" style="margin-bottom: 25px;"><label>API Key (Opsional)</label><input type="password" id="config-api-key" placeholder="Masukkan API Key"></div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="btn-action" onclick="saveOnlineConfig()"><i class="fa fa-save"></i> Simpan Konfigurasi</button>
-                <button class="btn-success" style="background: #3b82f6;" onclick="syncGoogleSheets()"><i class="fa fa-sync"></i> Sinkronisasi Sekarang</button>
-            </div>
-        </div>
     </div>
 
     <!-- VIEW INPUT JURNAL -->
@@ -371,7 +342,7 @@
                 <div class="form-group"><label>Uraian / Keterangan</label><input type="text" id="form-uraian" placeholder="Contoh: Kotak Amal Jumat..." required></div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                <button class="btn-action" id="btn-simpan" onclick="simpanTransaksi()"><i class="fa fa-check-circle"></i> Simpan Transaksi</button>
+                <button class="btn-action" id="btn-simpan" onclick="simpanTransaksi()"><i class="fa fa-check-circle"></i> Simpan ke Cloud</button>
                 <button class="btn-warning" id="btn-batal-edit" style="display:none;" onclick="batalEditMode()"><i class="fa fa-times"></i> Batal Edit</button>
             </div>
         </div>
@@ -380,7 +351,6 @@
     <!-- VIEW BUKU KAS -->
     <div id="view-bukukas" class="view-section">
         
-        <!-- BAGIAN KOP SURAT CETAK BUKU KAS -->
         <div class="print-header print-only">
             <h1>DKM JAMI AL-IKHLASH</h1>
             <h2>LAPORAN REKAPITULASI BUKU KAS</h2>
@@ -408,7 +378,6 @@
                 </div>
             </div>
 
-            <!-- Bagian Saldo -->
             <div class="print-saldo-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                 <div class="print-saldo-box" style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;">
                     <span style="font-size: 11px; font-weight: 700; color: var(--slate-muted); display: block; margin-bottom: 5px;">SALDO AWAL</span>
@@ -422,7 +391,6 @@
 
             <div class="section-title no-print"><i class="fa fa-list-alt"></i> Detail Jurnal</div>
             
-            <!-- Tabel Buku Kas -->
             <table style="width: 100%;">
                 <thead class="print-only">
                     <tr><th>Tanggal</th><th>Uraian</th><th class="col-rekening">Rekening</th><th>Masuk</th><th>Keluar</th><th>Saldo Berjalan</th><th class="no-print">Aksi</th></tr>
@@ -431,7 +399,6 @@
             </table>
         </div>
 
-        <!-- BAGIAN TANDA TANGAN CETAK -->
         <div class="print-footer print-only">
             <div class="print-footer-box">
                 <p>Dicetak tanggal: <span class="print-date-now"></span></p>
@@ -444,7 +411,6 @@
     <!-- VIEW DJP SPT -->
     <div id="view-djp" class="view-section">
         
-        <!-- BAGIAN KOP SURAT CETAK DJP -->
         <div class="print-header print-only">
             <h1>DKM JAMI AL-IKHLASH</h1>
             <h2>IKHTISAR SPT 1771 NIRLABA (LAMPIRAN PAJAK)</h2>
@@ -512,14 +478,29 @@
 
 </div>
 
-<!-- SCRIPT JS DENGAN TAMBAHAN FUNGSI PRINT -->
-<script>
-    const PIN_SISTEM = "070707"; 
-    let dbKas = [];
-    let dbAudit = [];
-    let operatorName = "Sekretaris";
+<!-- FIREBASE SDK & CORE APPLICATION SCRIPT -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    function cekLogin() {
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUSdGMAK1snoB8berOI2MOePu49iCWuqM",
+      authDomain: "kasmasjid-alikhlash.firebaseapp.com",
+      projectId: "kasmasjid-alikhlash",
+      storageBucket: "kasmasjid-alikhlash.firebasestorage.app",
+      messagingSenderId: "1094773543583",
+      appId: "1:1094773543583:web:39c8d2a9515d8446ce88aa"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const PIN_SISTEM = "070707"; 
+    window.dbKas = [];
+    window.dbAudit = [];
+    window.operatorName = "Sekretaris";
+
+    window.cekLogin = function() {
         if(document.getElementById('login-pin').value === PIN_SISTEM) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
@@ -527,7 +508,7 @@
             inisialisasiSistem();
         } else { document.getElementById('login-error').style.display = 'block'; }
     }
-    function logout() { sessionStorage.removeItem('dkm_secure_session'); window.location.reload(); }
+    window.logout = function() { sessionStorage.removeItem('dkm_secure_session'); window.location.reload(); }
 
     window.onload = () => {
         if(sessionStorage.getItem('dkm_secure_session') === 'ACTIVE') {
@@ -548,25 +529,28 @@
         document.getElementById('filter-bulan').value = new Date().getMonth() + 1;
         document.getElementById('form-tanggal').valueAsDate = new Date();
 
-        try {
-            dbKas = JSON.parse(localStorage.getItem('kasmasjid_core_v4'));
-            if (!Array.isArray(dbKas)) dbKas = [];
-        } catch(e) { dbKas = []; }
+        // Realtime Listener dari Firestore Firebase
+        onSnapshot(collection(db, "transaksi"), (snapshot) => {
+            window.dbKas = [];
+            snapshot.forEach((docSnap) => {
+                window.dbKas.push({ firebaseId: docSnap.id, ...docSnap.data() });
+            });
+            renderDashboard();
+        });
 
-        try {
-            dbAudit = JSON.parse(localStorage.getItem('kasmasjid_audit_v4'));
-            if (!Array.isArray(dbAudit)) dbAudit = [];
-        } catch(e) { dbAudit = []; }
-
-        initOnlineConfig();
-        renderDashboard();
-        pullDataFromGoogle();
+        onSnapshot(collection(db, "audit"), (snapshot) => {
+            window.dbAudit = [];
+            snapshot.forEach((docSnap) => {
+                window.dbAudit.push(docSnap.data());
+            });
+            if(document.getElementById('view-audit').classList.contains('active')) renderAudit();
+        });
     }
 
-    function formatRp(angka) { return new Intl.NumberFormat('id-ID').format(angka); }
-    function updateOperator() { operatorName = document.getElementById('input-operator').value || "Sekretaris"; }
+    window.formatRp = function(angka) { return new Intl.NumberFormat('id-ID').format(angka); }
+    window.updateOperator = function() { window.operatorName = document.getElementById('input-operator').value || "Sekretaris"; }
 
-    function switchView(viewId) {
+    window.switchView = function(viewId) {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('active'));
         document.getElementById('view-' + viewId).classList.add('active');
@@ -575,157 +559,83 @@
         if(viewId === 'audit') renderAudit();
     }
 
-    function autoBackup() { localStorage.setItem('kasmasjid_backup_auto', JSON.stringify({ core: dbKas, audit: dbAudit })); }
-
-    function simpanData() {
-        localStorage.setItem('kasmasjid_core_v4', JSON.stringify(dbKas));
-        localStorage.setItem('kasmasjid_audit_v4', JSON.stringify(dbAudit));
-        autoBackup(); syncGoogleSheets();
-    }
-
-    function catatAudit(aksi, nominal, txId = "-") {
+    async function catatAudit(aksi, nominal, txId = "-") {
         let now = new Date();
         let d = now.toLocaleDateString('id-ID'); let t = now.toLocaleTimeString('id-ID');
-        dbAudit.push({ waktu: d + ' ' + t, operator: operatorName, aksi: aksi, nominal: nominal, id: txId });
-        simpanData();
+        let logData = { waktu: d + ' ' + t, operator: window.operatorName, aksi: aksi, nominal: nominal, id: txId };
+        try { await addDoc(collection(db, "audit"), logData); } catch(e) { console.error(e); }
     }
 
-    function healthCheck() {
-        let issues = []; let ids = new Set(); let saldo = { Umum: 0, Soskem: 0, Renovasi: 0 };
-        if(!Array.isArray(dbKas)) issues.push("Database transaksi rusak.");
-        if(!Array.isArray(dbAudit)) issues.push("Database audit rusak.");
-
-        [...dbKas].forEach(tx => {
-            if(!tx.id) issues.push("Data tanpa ID terdeteksi.");
-            else if(ids.has(tx.id)) issues.push("ID duplikat terdeteksi: " + tx.id);
-            ids.add(tx.id);
-            if(!tx.tanggal) issues.push("Data tanpa tanggal: " + tx.id);
-            if(tx.nominal === undefined || tx.nominal === null || tx.nominal === "") issues.push("Data tanpa nominal: " + tx.id);
-            if(isNaN(tx.nominal)) issues.push("Nominal bukan angka: " + tx.id);
+    window.healthCheck = function() {
+        let issues = []; let saldo = { Umum: 0, Soskem: 0, Renovasi: 0 };
+        [...window.dbKas].forEach(tx => {
             let n = parseInt(tx.nominal) || 0;
             if(tx.jenis === 'Masuk') saldo[tx.rekening] += n;
             else if(tx.jenis === 'Keluar') saldo[tx.rekening] -= n;
-            else issues.push("Struktur transaksi tidak lengkap.");
         });
-
         if(saldo.Umum < 0) issues.push("Saldo negatif pada Kas Umum.");
         if(saldo.Soskem < 0) issues.push("Saldo negatif pada Kas Soskem.");
         if(saldo.Renovasi < 0) issues.push("Saldo negatif pada Kas Renovasi.");
 
-        if(issues.length === 0) { alert("System Health Check : OK"); } 
+        if(issues.length === 0) { alert("System Health Check (Firebase Cloud) : OK"); } 
         else { alert("Ditemukan " + issues.length + " masalah:\n- " + issues.join("\n- ")); }
     }
 
-    function saveOnlineConfig() {
-        localStorage.setItem('kasmasjid_gs_url', document.getElementById('config-gs-url').value);
-        localStorage.setItem('kasmasjid_api_key', document.getElementById('config-api-key').value);
-        alert("Konfigurasi API Tersimpan!");
-    }
-
-    function initOnlineConfig() {
-        document.getElementById('config-gs-url').value = localStorage.getItem('kasmasjid_gs_url') || '';
-        document.getElementById('config-api-key').value = localStorage.getItem('kasmasjid_api_key') || '';
-        document.getElementById('sync-time').innerText = localStorage.getItem('kasmasjid_last_sync') || '-';
-        if(localStorage.getItem('kasmasjid_gs_url')) {
-            document.getElementById('sync-status').innerText = 'Ready';
-            document.getElementById('sync-status').style.color = '#10b981';
-        }
-    }
-
-    function generateOnlineSummary() {
-        let summary = { Umum: { saldo: 0, masuk: 0, keluar: 0 }, Soskem: { saldo: 0, masuk: 0, keluar: 0 }, Renovasi: { saldo: 0, masuk: 0, keluar: 0 }, Total: { saldo: 0 } };
-        [...dbKas].forEach(tx => {
-            let n = parseInt(tx.nominal) || 0; let isMasuk = tx.jenis === 'Masuk';
-            if(summary[tx.rekening]) {
-                if(isMasuk) { summary[tx.rekening].masuk += n; summary[tx.rekening].saldo += n; summary.Total.saldo += n; } 
-                else { summary[tx.rekening].keluar += n; summary[tx.rekening].saldo -= n; summary.Total.saldo -= n; }
-            }
-        });
-        return summary;
-    }
-
-    async function pullDataFromGoogle() {
-        let url = localStorage.getItem('kasmasjid_gs_url'); if(!url) return;
-        try {
-            document.getElementById('sync-status').innerText = 'Menarik data...'; document.getElementById('sync-status').style.color = '#f59e0b';
-            const response = await fetch(url + "?action=getPublicData", { method: 'GET' });
-            const data = await response.json();
-            if (data && data.transaksi && data.transaksi.length > 0) {
-                dbKas = data.transaksi.map(tx => ({ id: tx.id || 'TX' + Math.random(), tanggal: tx.tanggal, rekening: tx.rekening, jenis: tx.arus || tx.jenis, nominal: parseInt(tx.nominal) || 0, uraian: tx.keterangan || tx.uraian }));
-                localStorage.setItem('kasmasjid_core_v4', JSON.stringify(dbKas));
-                renderDashboard();
-                document.getElementById('sync-status').innerText = 'Sinkron (Terbaru)'; document.getElementById('sync-status').style.color = '#10b981';
-            } else {
-                document.getElementById('sync-status').innerText = 'Berhasil (Kosong)'; document.getElementById('sync-status').style.color = '#10b981';
-            }
-        } catch(e) { document.getElementById('sync-status').innerText = 'Gagal Tarik Data'; document.getElementById('sync-status').style.color = '#ef4444'; }
-    }
-
-    async function syncGoogleSheets() {
-        let url = localStorage.getItem('kasmasjid_gs_url'); let apiKey = localStorage.getItem('kasmasjid_api_key');
-        if(!url) { document.getElementById('sync-status').innerText = 'Belum Disetel'; document.getElementById('sync-status').style.color = '#ef4444'; return; }
-        document.getElementById('sync-status').innerText = 'Syncing...'; document.getElementById('sync-status').style.color = '#f59e0b';
-        let mappedKas = dbKas.map(tx => ({ id: tx.id, tanggal: tx.tanggal, rekening: tx.rekening, arus: tx.jenis, nominal: tx.nominal, keterangan: tx.uraian }));
-        let mappedAudit = dbAudit.map(log => ({ waktu: log.waktu, aksi: log.aksi, idTransaksi: log.id || '-' }));
-        let payload = { action: 'syncData', apiKey: apiKey || '', summary: generateOnlineSummary(), transaksi: mappedKas, audit: mappedAudit };
-        try {
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-            let now = new Date().toLocaleString('id-ID');
-            localStorage.setItem('kasmasjid_last_sync', now);
-            document.getElementById('sync-time').innerText = now;
-            document.getElementById('sync-count').innerText = mappedKas.length + mappedAudit.length;
-            document.getElementById('sync-status').innerText = 'Berhasil Terhubung'; document.getElementById('sync-status').style.color = '#10b981';
-        } catch(e) { document.getElementById('sync-status').innerText = 'Gagal Sinkron'; document.getElementById('sync-status').style.color = '#ef4444'; }
-    }
-
-    function editTransaksiInit(id) {
-        let tx = [...dbKas].find(t => t.id === id); if(!tx) return;
+    window.editTransaksiInit = function(firebaseId) {
+        let tx = [...window.dbKas].find(t => t.firebaseId === firebaseId); if(!tx) return;
         document.getElementById('form-tanggal').value = tx.tanggal; document.getElementById('form-jenis').value = tx.jenis;
         document.getElementById('form-rekening').value = tx.rekening; document.getElementById('form-nominal').value = tx.nominal;
-        document.getElementById('form-uraian').value = tx.uraian; document.getElementById('form-edit-id').value = tx.id;
+        document.getElementById('form-uraian').value = tx.uraian; document.getElementById('form-edit-id').value = tx.firebaseId;
         document.getElementById('judul-form').innerHTML = '<i class="fa fa-edit"></i> Edit Jurnal Transaksi';
-        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-save"></i> Perbarui Transaksi';
+        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-save"></i> Perbarui di Cloud';
         document.getElementById('btn-simpan').style.background = '#0ea5e9'; document.getElementById('btn-batal-edit').style.display = 'flex';
         switchView('input');
         document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.btn-nav')[1].classList.add('active');
     }
 
-    function batalEditMode() {
+    window.batalEditMode = function() {
         document.getElementById('form-tanggal').valueAsDate = new Date(); document.getElementById('form-nominal').value = '';
         document.getElementById('form-uraian').value = ''; document.getElementById('form-edit-id').value = '';
         document.getElementById('judul-form').innerHTML = '<i class="fa fa-edit"></i> Formulir Jurnal Baru';
-        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-check-circle"></i> Simpan Transaksi';
+        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-check-circle"></i> Simpan ke Cloud';
         document.getElementById('btn-simpan').style.background = 'linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%)';
         document.getElementById('btn-batal-edit').style.display = 'none';
     }
 
-    function simpanTransaksi() {
+    window.simpanTransaksi = async function() {
         let tgl = document.getElementById('form-tanggal').value; let jns = document.getElementById('form-jenis').value;
         let rek = document.getElementById('form-rekening').value; let uraian = document.getElementById('form-uraian').value;
-        let nominal = parseInt(document.getElementById('form-nominal').value); let editId = document.getElementById('form-edit-id').value;
+        let nominal = parseInt(document.getElementById('form-nominal').value); let editFirebaseId = document.getElementById('form-edit-id').value;
         
         if(!tgl) { alert("Tanggal wajib diisi!"); return; } if(!rek) { alert("Rekening wajib dipilih!"); return; }
         if(isNaN(nominal) || nominal <= 0) { alert("Nominal harus angka dan lebih dari nol!"); return; } if(!uraian) { alert("Uraian wajib diisi!"); return; }
 
-        if(editId !== '') {
-            let index = dbKas.findIndex(t => t.id === editId);
-            if(index !== -1) {
-                dbKas[index] = { id: editId, tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal };
-                catatAudit(`EDIT`, nominal, editId); alert("Perubahan Berhasil Disimpan!"); batalEditMode();
+        try {
+            if(editFirebaseId !== '') {
+                const docRef = doc(db, "transaksi", editFirebaseId);
+                await updateDoc(docRef, { tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal });
+                catatAudit(`EDIT`, nominal, editFirebaseId); alert("Perubahan Berhasil Disimpan ke Cloud!"); batalEditMode();
+            } else {
+                let newId = 'TX' + Date.now();
+                await addDoc(collection(db, "transaksi"), { id: newId, tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal });
+                catatAudit(`TAMBAH`, nominal, newId); alert("Berhasil Tersimpan di Cloud!"); 
             }
-        } else {
-            let newId = 'TX' + Date.now();
-            dbKas.push({ id: newId, tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal });
-            catatAudit(`TAMBAH`, nominal, newId); alert("Tersimpan!"); 
-        }
-        simpanData(); document.getElementById('form-uraian').value = ''; document.getElementById('form-nominal').value = ''; switchView('dashboard');
+            document.getElementById('form-uraian').value = ''; document.getElementById('form-nominal').value = ''; switchView('dashboard');
+        } catch(err) { alert("Gagal menyimpan ke Firebase: " + err.message); }
     }
 
-    function hapusTransaksi(id, nominal, jenis) {
+    window.hapusTransaksi = async function(firebaseId, nominal) {
         let pinBatal = prompt("MASUKKAN PIN UNTUK MENGHAPUS TRANSAKSI:");
         if(pinBatal !== PIN_SISTEM) { alert("PIN Salah. Penghapusan dibatalkan."); return; }
-        if(confirm("Yakin hapus transaksi ini?")) { dbKas = dbKas.filter(tx => tx.id !== id); catatAudit("HAPUS", nominal, id); simpanData(); generateBukuKas(); }
+        if(confirm("Yakin hapus transaksi ini dari Cloud?")) {
+            try {
+                await deleteDoc(doc(db, "transaksi", firebaseId));
+                catatAudit("HAPUS", nominal, firebaseId);
+                alert("Transaksi berhasil dihapus!");
+                generateBukuKas();
+            } catch(e) { alert("Gagal menghapus: " + e.message); }
+        }
     }
 
     function renderDashboard() {
@@ -734,7 +644,7 @@
         document.getElementById('lbl-bulan-ini').innerText = monthNames[currentM-1] + " " + currentY;
         let inBln = 0, outBln = 0, txCount = 0; let saldoUmum = 0, saldoSoskem = 0, saldoRenovasi = 0;
 
-        [...dbKas].forEach(tx => {
+        [...window.dbKas].forEach(tx => {
             let n = parseInt(tx.nominal) || 0;
             if(tx.rekening === 'Umum') { tx.jenis === 'Masuk' ? saldoUmum += n : saldoUmum -= n; }
             if(tx.rekening === 'Soskem') { tx.jenis === 'Masuk' ? saldoSoskem += n : saldoSoskem -= n; }
@@ -755,7 +665,7 @@
         document.getElementById('dash-surplus').innerText = 'Rp ' + formatRp(inBln - outBln); 
         document.getElementById('dash-count').innerText = txCount;
 
-        let sorted = [...dbKas].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 10);
+        let sorted = [...window.dbKas].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 10);
         let tbody = document.getElementById('tbody-latest'); tbody.innerHTML = '';
         sorted.forEach(tx => {
             tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td class="print-only">${tx.rekening}</td><td>${tx.uraian}</td>
@@ -764,10 +674,10 @@
         });
     }
 
-    function generateBukuKas() {
+    window.generateBukuKas = function() {
         let fBulan = parseInt(document.getElementById('filter-bulan').value); let fTahun = parseInt(document.getElementById('filter-tahun').value);
         let fRek = document.getElementById('filter-rekening').value;
-        let sortedDB = [...dbKas].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+        let sortedDB = [...window.dbKas].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
 
         let saldoAwal = 0, inBulanIni = 0, outBulanIni = 0;
         let tbody = document.getElementById('tbody-bukukas'); tbody.innerHTML = '';
@@ -795,8 +705,8 @@
                     <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                     <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                     <td class="no-print action-btns">
-                        <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.id}')"><i class="fa fa-edit"></i> Edit</button>
-                        <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.id}', ${tx.nominal}, '${tx.jenis}')"><i class="fa fa-trash"></i> Hapus</button>
+                        <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
                     </td></tr>`;
             }
         });
@@ -804,12 +714,12 @@
         document.getElementById('buku-awal').innerText = 'Rp ' + formatRp(saldoAwal); document.getElementById('buku-akhir').innerText = 'Rp ' + formatRp(saldoBerjalan);
     }
 
-    function generateSPT() {
+    window.generateSPT = function() {
         let yearSPT = parseInt(document.getElementById('filter-tahun-spt').value);
         document.getElementById('label-spt-tahun').innerText = yearSPT;
         let spt = { Umum: { in: 0, out: 0 }, Soskem: { in: 0, out: 0 }, Renovasi: { in: 0, out: 0 }, Total: { in: 0, out: 0 } };
 
-        [...dbKas].forEach(tx => {
+        [...window.dbKas].forEach(tx => {
             let d = new Date(tx.tanggal);
             if(d.getFullYear() === yearSPT) {
                 let n = parseInt(tx.nominal) || 0; let isMasuk = tx.jenis === 'Masuk';
@@ -827,7 +737,6 @@
         document.getElementById('spt-content').style.display = 'block';
     }
 
-    // FUNGSI PERSIAPAN CETAK
     function setPrintMeta() {
         let mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         let fBulan = parseInt(document.getElementById('filter-bulan').value);
@@ -844,74 +753,54 @@
         if(elTahunSPT) elTahunSPT.innerText = document.getElementById('filter-tahun-spt').value;
 
         document.querySelectorAll('.print-date-now').forEach(el => el.innerText = new Date().toLocaleDateString('id-ID'));
-        document.querySelectorAll('.print-operator-name').forEach(el => el.innerText = operatorName);
+        document.querySelectorAll('.print-operator-name').forEach(el => el.innerText = window.operatorName);
     }
 
-    function cetakLaporan() { setPrintMeta(); window.print(); }
-    
-    function cetakSPT() {
+    window.cetakLaporan = function() { setPrintMeta(); window.print(); }
+    window.cetakSPT = function() {
         if(document.getElementById('spt-content').style.display === 'none') { alert("Harap Kalkulasi SPT terlebih dahulu sebelum mencetak!"); return; }
         setPrintMeta(); window.print(); 
     }
 
     function renderAudit() {
         let tbody = document.getElementById('tbody-audit'); tbody.innerHTML = '';
-        [...dbAudit].reverse().forEach(log => {
+        [...window.dbAudit].reverse().forEach(log => {
             tbody.innerHTML += `<tr><td>${log.waktu}</td><td><b>${log.operator}</b></td><td>${log.id || '-'}</td><td>${log.aksi}</td><td>Rp ${formatRp(log.nominal)}</td></tr>`;
         });
     }
 
-    function exportCSV() {
+    window.exportCSV = function() {
         let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Jenis,Rekening,Nominal,Uraian\n";
-        [...dbKas].forEach(function(rowArray) {
-            let row = `${rowArray.id},${rowArray.tanggal},${rowArray.jenis},${rowArray.rekening},${rowArray.nominal},"${rowArray.uraian}"`;
+        [...window.dbKas].forEach(function(rowArray) {
+            let row = `${rowArray.id || '-'},${rowArray.tanggal},${rowArray.jenis},${rowArray.rekening},${rowArray.nominal},"${rowArray.uraian}"`;
             csvContent += row + "\r\n";
         });
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a"); link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `Data_Kasmasjid_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute("download", `Data_Kasmasjid_Firebase_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function restoreAutoBackup() {
-        if(confirm("Yakin ingin memulihkan dari Auto Backup terakhir?")) {
-            try {
-                let backup = JSON.parse(localStorage.getItem('kasmasjid_backup_auto'));
-                if(backup && Array.isArray(backup.core)) {
-                    dbKas = backup.core; dbAudit = backup.audit || []; simpanData();
-                    catatAudit("RESTORE", 0, "AUTO"); alert("Auto Backup berhasil dipulihkan!"); window.location.reload();
-                } else { alert("Auto Backup tidak valid atau kosong."); }
-            } catch(e) { alert("Gagal memulihkan Auto Backup."); }
-        }
-    }
-
-    function backupJSON() {
-        const blob = new Blob([JSON.stringify({ core: dbKas, audit: dbAudit }, null, 2)], { type: "application/json" });
+    window.backupJSON = function() {
+        const blob = new Blob([JSON.stringify({ core: window.dbKas, audit: window.dbAudit }, null, 2)], { type: "application/json" });
         const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
         link.download = `Backup_Kasmasjid_${new Date().toISOString().split('T')[0]}.json`; link.click();
-        catatAudit("BACKUP", 0, "-");
     }
 
-    function restoreJSON(e) {
+    window.restoreJSON = function(e) {
         const file = e.target.files[0]; if(!file) return;
-        if(!file.name.toLowerCase().endsWith('.json')) { alert("Format file tidak didukung! Pastikan file berekstensi .json"); return; }
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = async function(evt) {
             try {
                 let parsed = JSON.parse(evt.target.result);
-                if(parsed.core && Array.isArray(parsed.core)) { 
-                    dbKas = parsed.core; dbAudit = parsed.audit || []; simpanData(); catatAudit("RESTORE", 0, "-"); alert("Restore Berhasil!"); window.location.reload(); 
-                } 
-                else if(Array.isArray(parsed) && parsed.length > 0) {
-                    dbKas = parsed.map(tx => {
-                        let rek = "Umum";
-                        if(tx.alokasiKartu === "Kartu Soskem" || tx.alokasiKartu === "Kartu Sosial" || tx.rekening === "Soskem") rek = "Soskem";
-                        if(tx.alokasiKartu === "Kartu Renovasi" || tx.rekening === "Renovasi") rek = "Renovasi";
-                        return { id: tx.id || 'TX' + Math.random(), tanggal: tx.tanggal, jenis: tx.arus || tx.jenis, rekening: rek, uraian: tx.keterangan || tx.uraian || "Migrasi Data Lama", nominal: parseInt(tx.nominal) || 0 };
-                    });
-                    dbAudit = []; simpanData(); catatAudit("RESTORE", 0, "-"); alert("Migrasi Data Lama Berhasil!"); window.location.reload();
-                } else { alert("Format backup tidak valid!"); }
-            } catch(err) { alert("File JSON Rusak!"); }
+                if(parsed.core && Array.isArray(parsed.core)) {
+                    for(let tx of parsed.core) {
+                        delete tx.firebaseId;
+                        await addDoc(collection(db, "transaksi"), tx);
+                    }
+                    alert("Restore & Sinkronisasi ke Cloud Berhasil!"); window.location.reload(); 
+                } else { alert("Format file backup tidak valid!"); }
+            } catch(err) { alert("Gagal memproses file JSON!"); }
         };
         reader.readAsText(file);
     }
