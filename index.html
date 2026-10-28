@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kasmasjid V4.4 Online Reporting - Secure</title>
+    <!-- PWA settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kasmasjid">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063185.png">
+    <meta name="theme-color" content="#f3f4f6">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=700&family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --islamic-green-deep: #064e3b;
+            --islamic-green-mint: #0f766e;
+            --islamic-gold: #d97706;
+            --premium-pearl: #ffffff;
+            --slate-dark: #0f172a;
+            --slate-muted: #64748b;
+            --system-bg: #f8fafc;
+            --banking-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.03);
+            --radius-premium: 24px;
+            --radius-md: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--system-bg);
+            background-image: radial-gradient(at 0% 0%, rgba(15, 118, 110, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(217, 119, 6, 0.05) 0px, transparent 50%);
+            color: var(--slate-dark);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        /* --- LOGIN SCREEN SECURITY --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--islamic-green-deep) 0%, #022c22 100%);
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .login-box { background: white; padding: 40px 30px; border-radius: var(--radius-premium); text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .login-box h2 { color: var(--islamic-green-deep); margin-bottom: 10px; font-family: 'Cinzel', serif; font-size: 22px;}
+        .login-box input { width: 100%; padding: 18px; border: 2px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; margin-bottom: 20px; font-size: 20px; text-align: center; font-weight: 800; letter-spacing: 8px; }
+        .login-box input:focus { border-color: var(--islamic-green-mint); outline: none; background: white;}
+        .login-box button { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--islamic-gold) 0%, #b45309 100%); color: white; border: none; border-radius: var(--radius-md); font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        
+        #app-container { display: none; max-width: 1200px; margin: 0 auto; }
+
+        /* --- APP HEADER --- */
+        .web-main-header { background: var(--premium-pearl); padding: 15px 20px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); margin-bottom: 25px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .header-brand { display: flex; align-items: center; gap: 15px; }
+        .header-icon { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 22px; box-shadow: 0 4px 10px rgba(6, 78, 59, 0.2); }
+        .header-text h1 { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: var(--islamic-green-deep); }
+        .header-text p { font-size: 12px; color: var(--slate-muted); margin-top: 2px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-logout { background: #fef2f2; color: #ef4444; width: 40px; height: 40px; border-radius: 12px; border: none; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* --- RUNNING TEXT --- */
+        .marquee-container { width: 100%; background: #f1f5f9; border-radius: 8px; padding: 6px 10px; overflow: hidden; white-space: nowrap; position: relative; border-left: 3px solid var(--islamic-green-mint); }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; font-size: 11px; font-weight: 700; color: var(--slate-dark); text-transform: uppercase; letter-spacing: 1px; }
+        .marquee-text i { color: var(--islamic-gold); margin: 0 5px; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* --- NAVIGASI TOOLS (ATAS) --- */
+        .nav-bar-tools { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; -ms-overflow-style: none; scrollbar-width: none; }
+        .nav-bar-tools::-webkit-scrollbar { display: none; }
+        .btn-nav { background: white; color: var(--slate-muted); border: 1px solid #e2e8f0; padding: 12px 18px; font-size: 13px; font-weight: 700; border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
+        
+        /* --- NAVIGASI UTAMA (BOTTOM NAV MOBILE) --- */
+        .mobile-bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 15px 5px 25px 5px; z-index: 1000; border-top-left-radius: 30px; border-top-right-radius: 30px; border-top: 1px solid rgba(255,255,255,0.5);
+        }
+        .mobile-bottom-nav .btn-nav { flex-direction: column; padding: 0; border: none; background: transparent; color: #94a3b8; border-radius: 0; box-shadow: none; font-size: 11px; gap: 6px; flex: 1; font-weight: 700; }
+        .mobile-bottom-nav .btn-nav i { font-size: 22px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .mobile-bottom-nav .btn-nav.active { color: var(--islamic-green-deep); }
+        .mobile-bottom-nav .btn-nav.active i { transform: translateY(-4px) scale(1.1); color: var(--islamic-green-mint); }
+
+        .operator-input { padding: 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 13px; outline: none; background: white; min-width: 150px; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- DASHBOARD CARDS LEBIH MEWAH --- */
+        .dashboard-main-balances { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: 25px; }
+        .dashboard-activity-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        
+        .account-card { border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.15); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .account-card::after { font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -15px; bottom: -20px; font-size: 120px; opacity: 0.1; line-height: 1; }
+        
+        .card-umum { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); } .card-umum::after { content: '\f66f'; }
+        .card-soskem { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); } .card-soskem::after { content: '\f4c4'; }
+        .card-renovasi { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); } .card-renovasi::after { content: '\f6d1'; }
+
+        .account-card span.label-text { font-size: 12px; opacity: 0.9; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .account-card h2.balance-amount { font-size: 32px; font-weight: 800; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        .card-activity { background: white; color: var(--slate-dark); box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; padding: 20px; border-radius: var(--radius-premium); }
+        .card-activity span.label-text { color: var(--slate-muted); }
+        .card-activity h2.balance-amount { font-size: 22px; text-shadow: none; }
+        
+        .txt-in { color: #10b981 !important; } .txt-out { color: #ef4444 !important; }
+
+        .section-title { font-size: 16px; font-weight: 800; color: var(--slate-dark); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .section-title i { color: var(--islamic-green-mint); }
+
+        .workspace-banking-card { background: white; border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; margin-bottom: 25px; }
+        
+        .filter-controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; background: #f8fafc; padding: 18px; border-radius: var(--radius-premium); border: 1px solid #e2e8f0; }
+        .filter-controls select, .filter-controls input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 600; outline: none; background: white; appearance: none; }
+        
+        .btn-action, .btn-print, .btn-warning, .btn-success, .btn-teal { width: 100%; padding: 15px; font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s;}
+        .btn-action { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); }
+        .btn-print { background: var(--slate-dark); }
+        .btn-warning { background: #f59e0b; }
+        .btn-success { background: #10b981; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 12px; font-weight: 700; color: var(--slate-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { padding: 16px; border-radius: 14px; border: 1px solid #cbd5e1; outline: none; font-weight: 700; font-size: 15px; background: #f8fafc; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { background: white; border-color: var(--islamic-green-mint); box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1); }
+
+        /* DJP SPT STYLES */
+        .spt-box { background: white; border: 1px solid #e2e8f0; border-radius: 18px; padding: 22px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);}
+        .spt-box h4 { border-bottom: 2px dashed #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; color: var(--slate-dark); font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;}
+        .spt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--slate-muted); }
+        .spt-row.total { font-weight: 800; font-size: 16px; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 10px; color: var(--islamic-green-deep); }
+
+        /* SYNC ONLINE STYLES */
+        .sync-dashboard { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
+        .sync-card { background: white; padding: 20px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); text-align: left; border: 1px solid #f1f5f9; border-left: 5px solid #3b82f6; }
+        .sync-card h3 { font-size: 12px; color: var(--slate-muted); margin-bottom: 5px; font-weight: 700; }
+        .sync-card .val { font-size: 18px; font-weight: 800; color: var(--slate-dark); }
+
+        /* HIDE SCROLLBARS FOR CLEANER LOOK */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .print-only { display: none; }
+
+        /* =========================================
+           NATIVE LIST VIEW (HANYA AKTIF DI LAYAR HP)
+           ========================================= */
+        @media screen {
+            table { width: 100%; border-collapse: collapse; display: block; border: none; }
+            thead { display: none; }
+            tbody { display: block; width: 100%; }
+            tr { display: flex; flex-wrap: wrap; align-items: center; background: white; margin-bottom: 15px; border-radius: 18px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; position: relative; }
+            td { display: block; padding: 0 !important; border: none !important; font-size: 13px; line-height: 1.4; width: 100%; }
+
+            #tbody-latest tr, #tbody-audit tr { align-items: flex-start; }
+            #tbody-latest td:nth-child(3), #tbody-audit td:nth-child(2) { font-size: 15px; font-weight: 800; color: var(--slate-dark); order: 1; margin-bottom: 8px; padding-right: 100px !important; }
+            #tbody-latest td:nth-child(1), #tbody-audit td:nth-child(1) { width: auto !important; font-size: 12px; color: var(--slate-muted); order: 2; margin-right: 10px; font-weight: 600; }
+            #tbody-latest td:nth-child(2), #tbody-audit td:nth-child(3) { width: auto !important; font-size: 11px; background: #f8fafc; color: var(--slate-muted); padding: 4px 10px !important; border-radius: 8px; order: 3; font-weight: 700; border: 1px solid #e2e8f0; }
+            #tbody-latest td:nth-child(4), #tbody-audit td:nth-child(4) { display: none !important; }
+            #tbody-latest td:nth-child(5), #tbody-audit td:nth-child(5) { width: auto !important; position: absolute; right: 18px; top: 18px; font-size: 15px; font-weight: 800; order: 99; }
+
+            #tbody-bukukas tr { align-items: flex-start; }
+            #tbody-bukukas td:nth-child(2) { font-size: 15px; font-weight: 800; order: 1; margin-bottom: 10px; color: var(--slate-dark); } 
+            #tbody-bukukas td:nth-child(1) { font-size: 12px; color: var(--slate-muted); order: 2; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0 !important; padding-bottom: 12px !important; font-weight: 600; } 
+            #tbody-bukukas td.col-rekening { display: none !important; }
+            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 14px; font-weight: 800; color: #10b981; } 
+            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 14px; font-weight: 800; color: #ef4444; text-align: right; } 
+            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(6) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
+            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 10px; } 
+            
+            .btn-sm { padding: 12px; border-radius: 12px; border: none; color: white; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
+            .bg-red { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; } 
+            .bg-blue { background: #f0f9ff; color: #0ea5e9; border: 1px solid #bae6fd; }
+        }
+
+        /* =========================================
+           PENGATURAN KHUSUS CETAK PDF / KERTAS A4
+           ========================================= */
+        @media print {
+            @page { size: A4 portrait; margin: 15mm; }
+            body { background: white !important; padding: 0 !important; color: black !important; background-image: none !important; }
+            
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            
+            /* FIX UNTUK LEBAR KOLOM TABEL YANG RUSAK */
+            th.print-only, td.print-only { display: table-cell !important; }
+            thead.print-only { display: table-header-group !important; }
+
+            /* Paksa tabel kembali ke sifat alaminya */
+            table { display: table !important; width: 100% !important; border-collapse: collapse !important; border: 1px solid black !important; margin-bottom: 20px !important; }
+            thead { display: table-header-group !important; }
+            tbody { display: table-row-group !important; }
+            tr { display: table-row !important; page-break-inside: avoid !important; }
+            th, td { display: table-cell !important; border: 1px solid black !important; padding: 8px !important; font-size: 12px !important; text-align: left !important; width: auto !important; }
+            th { background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; color: black !important; font-weight: bold !important; text-transform: uppercase; }
+
+            .workspace-banking-card, .summary-box, .spt-box, .dashboard-activity-balances { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
+            
+            /* Kop Surat Cetak */
+            .print-header { text-align: center; border-bottom: 4px double black; margin-bottom: 20px; padding-bottom: 15px; }
+            .print-header h1 { font-family: 'Cinzel', serif; font-size: 24px; color: black; margin: 0 0 5px 0; }
+            .print-header h2 { font-size: 16px; font-weight: bold; margin: 0 0 5px 0; text-transform: uppercase; }
+            .print-header p { font-size: 12px; margin: 0; }
+
+            /* Kotak Saldo Cetak */
+            .print-saldo-container { display: flex !important; justify-content: space-between !important; margin-bottom: 20px !important; border: 1px solid black !important; padding: 10px !important; }
+            .print-saldo-box { text-align: center !important; width: 48%; }
+            .print-saldo-box span:first-child { font-size: 11px !important; font-weight: bold !important; text-transform: uppercase !important; display: block !important; }
+            .print-saldo-box span:last-child { font-size: 14px !important; font-weight: bold !important; display: block !important; }
+
+            /* SPT Box Cetak */
+            .spt-box { border: 1px solid black !important; border-radius: 0 !important; margin-bottom: 15px !important; break-inside: avoid; }
+            .spt-box h4 { border-bottom: 1px solid black !important; color: black !important; font-size: 14px !important; margin-bottom: 10px !important; padding-bottom: 5px !important; }
+            .spt-row.total { color: black !important; border-top: 1px solid black !important; font-size: 14px !important; }
+
+            /* Tanda Tangan Cetak */
+            .print-footer { margin-top: 40px; display: flex !important; justify-content: flex-end !important; page-break-inside: avoid; }
+            .print-footer-box { text-align: center; width: 250px; }
+            .print-footer-box p { font-size: 12px; margin: 3px 0; color: black; }
+            .signature-line { margin-top: 60px; font-weight: bold; text-decoration: underline; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <i class="fa fa-mosque" style="font-size: 55px; color: var(--islamic-green-deep); margin-bottom: 25px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));"></i>
+        <h2>Otorisasi Sistem Kas</h2>
+        <p style="color: var(--slate-muted); margin-bottom: 30px; font-size: 14px; font-weight: 600;">Masukkan PIN Sekretaris</p>
+        <input type="password" id="login-pin" placeholder="••••••" onkeypress="if(event.key === 'Enter') cekLogin()">
+        <button onclick="cekLogin()"><i class="fa fa-lock-open"></i> Buka Brankas</button>
+        <p id="login-error" style="color: #ef4444; font-size: 13px; font-weight: bold; margin-top: 15px; display: none;">
+            <i class="fa fa-exclamation-circle"></i> PIN Salah! Akses Ditolak.
+        </p>
+    </div>
+</div>
+
+<div class="container" id="app-container">
+    
+    <div class="web-main-header no-print">
+        <div class="header-top">
+            <div class="header-brand">
+                <div class="header-icon"><i class="fa fa-mosque"></i></div>
+                <div class="header-text">
+                    <h1>Kas Al-Ikhlash</h1>
+                    <p><i class="fa fa-user-shield" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Sekretaris</span></p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-logout" onclick="logout()"><i class="fa fa-power-off"></i></button>
+            </div>
+        </div>
+        <div class="marquee-container">
+            <span class="marquee-text">
+                Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure By A.H.RUKMANA <i class="fa fa-star-and-crescent"></i> Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure By A.H.RUKMANA
+            </span>
+        </div>
+    </div>
+
+    <!-- GRUP 1: Bottom Nav (Mobile) -->
+    <div class="mobile-bottom-nav no-print">
+        <button class="btn-nav active" onclick="switchView('dashboard')"><i class="fa fa-home"></i> <span>Dashboard</span></button>
+        <button class="btn-nav" onclick="switchView('input')"><i class="fa fa-plus-circle"></i> <span>Transaksi</span></button>
+        <button class="btn-nav" onclick="switchView('bukukas')"><i class="fa fa-book"></i> <span>Buku Kas</span></button>
+        <button class="btn-nav" onclick="switchView('djp')"><i class="fa fa-file-invoice-dollar"></i> <span>DJP SPT</span></button>
+    </div>
+
+    <!-- GRUP 2: Scrollable Top Menu -->
+    <div class="nav-bar-tools no-print">
+        <button class="btn-nav" onclick="switchView('audit')"><i class="fa fa-history"></i> Log Audit</button>
+        <button class="btn-nav" onclick="switchView('online')" style="background: #f0f9ff; color: #0284c7; border-color: #bae6fd;"><i class="fa fa-cloud"></i> Sinkronisasi Cloud</button>
+        <button class="btn-nav" onclick="healthCheck()"><i class="fa fa-stethoscope"></i> Cek Sistem</button>
+        <input type="text" id="input-operator" class="operator-input" placeholder="Ubah Operator..." oninput="updateOperator()" value="Sekretaris">
+        <button class="btn-nav" onclick="restoreAutoBackup()" style="color: #10b981; border-color: #10b981;"><i class="fa fa-recycle"></i> Auto Backup</button>
+        <button class="btn-nav" onclick="backupJSON()"><i class="fa fa-database"></i> Backup Data</button>
+        <input type="file" id="file-restore" accept=".json" style="display:none;" onchange="restoreJSON(event)">
+        <button class="btn-nav" onclick="document.getElementById('file-restore').click()"><i class="fa fa-upload"></i> Restore File</button>
+    </div>
+
+    <!-- VIEW DASHBOARD -->
+    <div id="view-dashboard" class="view-section active no-print">
+        <div class="section-title"><i class="fa fa-wallet"></i> Saldo Kas Terkini</div>
+        <div class="dashboard-main-balances">
+            <div class="account-card card-umum">
+                <span class="label-text">Saldo Kas Umum</span>
+                <h2 class="balance-amount" id="dash-total-umum">Rp 0</h2>
+            </div>
+            <div class="account-card card-soskem">
+                <span class="label-text">Kas Sosial & Kematian</span>
+                <h2 class="balance-amount" id="dash-total-soskem">Rp 0</h2>
+            </div>
+            <div class="account-card card-renovasi">
+                <span class="label-text">Kas Renovasi Pembangunan</span>
+                <h2 class="balance-amount" id="dash-total-renovasi">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fa fa-chart-line"></i> Rekap Bulan Ini (<span id="lbl-bulan-ini"></span>)</div>
+        <div class="dashboard-activity-balances">
+            <div class="account-card card-activity">
+                <span class="label-text">Pemasukan</span>
+                <h2 class="balance-amount txt-in" id="dash-in">Rp 0</h2>
+            </div>
+            <div class="account-card card-activity">
+                <span class="label-text">Pengeluaran</span>
+                <h2 class="balance-amount txt-out" id="dash-out">Rp 0</h2>
+            </div>
+            <div class="account-card card-activity" style="grid-column: span 2; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                <div>
+                    <span class="label-text">Surplus / Defisit</span>
+                    <h2 class="balance-amount" id="dash-surplus" style="margin-top: 5px;">Rp 0</h2>
+                </div>
+                <div style="text-align: right; background: #f8fafc; padding: 10px 15px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <span class="label-text" style="font-size: 10px;">Total Transaksi</span>
+                    <h2 class="balance-amount" id="dash-count" style="margin-top: 0; font-size: 20px; color: var(--islamic-green-deep);">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fa fa-list"></i> 10 Transaksi Terakhir</div>
+        <table>
+            <thead class="print-only"><tr><th>Tanggal</th><th>Rekening</th><th>Uraian</th><th>Jenis</th><th>Nominal</th></tr></thead>
+            <tbody id="tbody-latest"></tbody>
+        </table>
+    </div>
+
+    <!-- VIEW ONLINE -->
+    <div id="view-online" class="view-section no-print">
+        <div class="section-title"><i class="fa fa-cloud-upload-alt"></i> Status Cloud</div>
+        <div class="sync-dashboard">
+            <div class="sync-card" style="border-left-color: #10b981;"><h3>Status Koneksi</h3><div class="val" id="sync-status">Belum Disetel</div></div>
+            <div class="sync-card" style="border-left-color: #f59e0b;"><h3>Terakhir Sinkron</h3><div class="val" id="sync-time" style="font-size: 14px;">-</div></div>
+            <div class="sync-card" style="border-left-color: #8b5cf6;"><h3>Total Data Terkirim</h3><div class="val" id="sync-count">0</div></div>
+        </div>
+        <div class="workspace-banking-card">
+            <div class="section-title">Konfigurasi API</div>
+            <div class="form-group" style="margin-bottom: 15px;"><label>Google Apps Script URL Endpoint</label><input type="text" id="config-gs-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+            <div class="form-group" style="margin-bottom: 25px;"><label>API Key (Opsional)</label><input type="password" id="config-api-key" placeholder="Masukkan API Key"></div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-action" onclick="saveOnlineConfig()"><i class="fa fa-save"></i> Simpan Konfigurasi</button>
+                <button class="btn-success" style="background: #3b82f6;" onclick="syncGoogleSheets()"><i class="fa fa-sync"></i> Sinkronisasi Sekarang</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW INPUT JURNAL -->
+    <div id="view-input" class="view-section no-print">
+        <div class="workspace-banking-card">
+            <div class="section-title" id="judul-form"><i class="fa fa-edit"></i> Formulir Jurnal Baru</div>
+            <input type="hidden" id="form-edit-id"> 
+            <div class="form-grid">
+                <div class="form-group"><label>Tanggal Transaksi</label><input type="date" id="form-tanggal" required></div>
+                <div class="form-group"><label>Jenis Mutasi</label><select id="form-jenis"><option value="Masuk">Pemasukan (Masuk)</option><option value="Keluar">Pengeluaran (Keluar)</option></select></div>
+                <div class="form-group"><label>Pos Rekening Kas</label><select id="form-rekening"><option value="Umum">Kas Umum</option><option value="Soskem">Kas Sosial & Kematian</option><option value="Renovasi">Kas Renovasi Pembangunan</option></select></div>
+                <div class="form-group"><label>Nominal Rupiah</label><input type="number" id="form-nominal" placeholder="Contoh: 150000" min="1" required></div>
+                <div class="form-group"><label>Uraian / Keterangan</label><input type="text" id="form-uraian" placeholder="Contoh: Kotak Amal Jumat..." required></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <button class="btn-action" id="btn-simpan" onclick="simpanTransaksi()"><i class="fa fa-check-circle"></i> Simpan Transaksi</button>
+                <button class="btn-warning" id="btn-batal-edit" style="display:none;" onclick="batalEditMode()"><i class="fa fa-times"></i> Batal Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW BUKU KAS -->
+    <div id="view-bukukas" class="view-section">
+        
+        <!-- BAGIAN KOP SURAT CETAK BUKU KAS -->
+        <div class="print-header print-only">
+            <h1>DKM JAMI AL-IKHLASH</h1>
+            <h2>LAPORAN REKAPITULASI BUKU KAS</h2>
+            <p>Periode: <span id="print-periode"></span> | Rekening: <span id="print-rekening"></span></p>
+        </div>
+
+        <div class="workspace-banking-card">
+            <div class="section-title no-print"><i class="fa fa-filter"></i> Filter Laporan</div>
+            <div class="filter-controls no-print">
+                <select id="filter-bulan">
+                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="filter-tahun"></select>
+                <select id="filter-rekening">
+                    <option value="Semua">Semua Rekening</option><option value="Umum">Kas Umum</option>
+                    <option value="Soskem">Kas Sosial & Kematian</option><option value="Renovasi">Kas Renovasi</option>
+                </select>
+                <button class="btn-action" onclick="generateBukuKas()"><i class="fa fa-search"></i> Tampilkan Data</button>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <button class="btn-print" style="flex: 1;" onclick="cetakLaporan()"><i class="fa fa-file-pdf"></i> PDF</button>
+                    <button class="btn-success" style="flex: 1;" onclick="exportCSV()"><i class="fa fa-file-excel"></i> CSV</button>
+                </div>
+            </div>
+
+            <!-- Bagian Saldo -->
+            <div class="print-saldo-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <div class="print-saldo-box" style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--slate-muted); display: block; margin-bottom: 5px;">SALDO AWAL</span>
+                    <span id="buku-awal" style="font-size: 16px; font-weight: 800;">Rp 0</span>
+                </div>
+                <div class="print-saldo-box" style="background: #ecfdf5; padding: 15px; border-radius: 16px; border: 1px solid #a7f3d0; text-align: center;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--islamic-green-mint); display: block; margin-bottom: 5px;">SALDO AKHIR</span>
+                    <span id="buku-akhir" style="font-size: 16px; font-weight: 800; color: var(--islamic-green-deep);">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="section-title no-print"><i class="fa fa-list-alt"></i> Detail Jurnal</div>
+            
+            <!-- Tabel Buku Kas -->
+            <table style="width: 100%;">
+                <thead class="print-only">
+                    <tr><th>Tanggal</th><th>Uraian</th><th class="col-rekening">Rekening</th><th>Masuk</th><th>Keluar</th><th>Saldo Berjalan</th><th class="no-print">Aksi</th></tr>
+                </thead>
+                <tbody id="tbody-bukukas"><tr><td colspan="7" style="text-align:center; padding: 20px !important;">Silakan filter dan tampilkan data.</td></tr></tbody>
+            </table>
+        </div>
+
+        <!-- BAGIAN TANDA TANGAN CETAK -->
+        <div class="print-footer print-only">
+            <div class="print-footer-box">
+                <p>Dicetak tanggal: <span class="print-date-now"></span></p>
+                <p>Sekretaris / Operator</p>
+                <div class="signature-line print-operator-name">Sekretaris</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW DJP SPT -->
+    <div id="view-djp" class="view-section">
+        
+        <!-- BAGIAN KOP SURAT CETAK DJP -->
+        <div class="print-header print-only">
+            <h1>DKM JAMI AL-IKHLASH</h1>
+            <h2>IKHTISAR SPT 1771 NIRLABA (LAMPIRAN PAJAK)</h2>
+            <p>Tahun Pajak: <span id="print-spt-tahun"></span></p>
+        </div>
+
+        <div class="workspace-banking-card">
+            <div class="section-title no-print"><i class="fa fa-calculator"></i> Laporan Tahunan (SPT)</div>
+            <div class="filter-controls no-print">
+                <select id="filter-tahun-spt"></select>
+                <button class="btn-action" onclick="generateSPT()"><i class="fa fa-cogs"></i> Kalkulasi SPT</button>
+                <button class="btn-print" onclick="cetakSPT()" style="margin-top:5px;"><i class="fa fa-file-pdf"></i> Cetak / Export PDF</button>
+            </div>
+
+            <div id="spt-content" style="display: none; margin-top: 20px;">
+                <div class="spt-box">
+                    <h4><i class="fa fa-cube no-print" style="color:var(--islamic-green-mint)"></i> Kas Umum</h4>
+                    <div class="spt-row"><span>Total Penerimaan</span><span class="txt-in" id="spt-in-umum">Rp 0</span></div>
+                    <div class="spt-row"><span>Total Pengeluaran</span><span class="txt-out" id="spt-out-umum">Rp 0</span></div>
+                    <div class="spt-row total"><span>Surplus/Defisit</span><span id="spt-surplus-umum">Rp 0</span></div>
+                </div>
+
+                <div class="spt-box">
+                    <h4><i class="fa fa-heart no-print" style="color:#f59e0b"></i> Kas Soskem</h4>
+                    <div class="spt-row"><span>Total Penerimaan</span><span class="txt-in" id="spt-in-soskem">Rp 0</span></div>
+                    <div class="spt-row"><span>Total Pengeluaran</span><span class="txt-out" id="spt-out-soskem">Rp 0</span></div>
+                    <div class="spt-row total"><span>Surplus/Defisit</span><span id="spt-surplus-soskem">Rp 0</span></div>
+                </div>
+
+                <div class="spt-box">
+                    <h4><i class="fa fa-hammer no-print" style="color:#3b82f6"></i> Kas Renovasi</h4>
+                    <div class="spt-row"><span>Total Penerimaan</span><span class="txt-in" id="spt-in-renovasi">Rp 0</span></div>
+                    <div class="spt-row"><span>Total Pengeluaran</span><span class="txt-out" id="spt-out-renovasi">Rp 0</span></div>
+                    <div class="spt-row total"><span>Surplus/Defisit</span><span id="spt-surplus-renovasi">Rp 0</span></div>
+                </div>
+
+                <div class="spt-box" style="background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); color: white; border: none; margin-top: 25px; box-shadow: 0 10px 20px rgba(6,78,59,0.2);">
+                    <h4 style="color: white; border-bottom: 1px dashed rgba(255,255,255,0.3);">KESIMPULAN TAHUN <span id="label-spt-tahun"></span></h4>
+                    <div class="spt-row" style="color: #a7f3d0;"><span>Penerimaan Bruto</span><span id="spt-in-total">Rp 0</span></div>
+                    <div class="spt-row" style="color: #fca5a5;"><span>Pengeluaran Bruto</span><span id="spt-out-total">Rp 0</span></div>
+                    <div class="spt-row total" style="color: white; border-top: 1px solid rgba(255,255,255,0.3);"><span>SALDO BERSIH</span><span id="spt-surplus-total">Rp 0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-footer print-only">
+            <div class="print-footer-box">
+                <p>Dicetak tanggal: <span class="print-date-now"></span></p>
+                <p>Sekretaris DKM</p>
+                <div class="signature-line print-operator-name">Sekretaris</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW AUDIT -->
+    <div id="view-audit" class="view-section no-print">
+        <div class="workspace-banking-card">
+            <div class="section-title"><i class="fa fa-user-shield"></i> Log Aktivitas Sistem</div>
+            <table>
+                <thead class="print-only"><tr><th>Waktu</th><th>Operator</th><th>ID Transaksi</th><th>Aktivitas</th><th>Nominal</th></tr></thead>
+                <tbody id="tbody-audit"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT JS DENGAN TAMBAHAN FUNGSI PRINT -->
+<script>
+    const PIN_SISTEM = "070707"; 
+    let dbKas = [];
+    let dbAudit = [];
+    let operatorName = "Sekretaris";
+
+    function cekLogin() {
+        if(document.getElementById('login-pin').value === PIN_SISTEM) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            sessionStorage.setItem('dkm_secure_session', 'ACTIVE');
+            inisialisasiSistem();
+        } else { document.getElementById('login-error').style.display = 'block'; }
+    }
+    function logout() { sessionStorage.removeItem('dkm_secure_session'); window.location.reload(); }
+
+    window.onload = () => {
+        if(sessionStorage.getItem('dkm_secure_session') === 'ACTIVE') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            inisialisasiSistem();
+        }
+    };
+
+    function inisialisasiSistem() {
+        let yearSel = document.getElementById('filter-tahun');
+        let yearSptSel = document.getElementById('filter-tahun-spt');
+        let curYear = new Date().getFullYear();
+        for(let i=curYear; i>=curYear-5; i--) { 
+            yearSel.innerHTML += `<option value="${i}">${i}</option>`; 
+            yearSptSel.innerHTML += `<option value="${i}">${i}</option>`; 
+        }
+        document.getElementById('filter-bulan').value = new Date().getMonth() + 1;
+        document.getElementById('form-tanggal').valueAsDate = new Date();
+
+        try {
+            dbKas = JSON.parse(localStorage.getItem('kasmasjid_core_v4'));
+            if (!Array.isArray(dbKas)) dbKas = [];
+        } catch(e) { dbKas = []; }
+
+        try {
+            dbAudit = JSON.parse(localStorage.getItem('kasmasjid_audit_v4'));
+            if (!Array.isArray(dbAudit)) dbAudit = [];
+        } catch(e) { dbAudit = []; }
+
+        initOnlineConfig();
+        renderDashboard();
+        pullDataFromGoogle();
+    }
+
+    function formatRp(angka) { return new Intl.NumberFormat('id-ID').format(angka); }
+    function updateOperator() { operatorName = document.getElementById('input-operator').value || "Sekretaris"; }
+
+    function switchView(viewId) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(viewId === 'dashboard') renderDashboard();
+        if(viewId === 'audit') renderAudit();
+    }
+
+    function autoBackup() { localStorage.setItem('kasmasjid_backup_auto', JSON.stringify({ core: dbKas, audit: dbAudit })); }
+
+    function simpanData() {
+        localStorage.setItem('kasmasjid_core_v4', JSON.stringify(dbKas));
+        localStorage.setItem('kasmasjid_audit_v4', JSON.stringify(dbAudit));
+        autoBackup(); syncGoogleSheets();
+    }
+
+    function catatAudit(aksi, nominal, txId = "-") {
+        let now = new Date();
+        let d = now.toLocaleDateString('id-ID'); let t = now.toLocaleTimeString('id-ID');
+        dbAudit.push({ waktu: d + ' ' + t, operator: operatorName, aksi: aksi, nominal: nominal, id: txId });
+        simpanData();
+    }
+
+    function healthCheck() {
+        let issues = []; let ids = new Set(); let saldo = { Umum: 0, Soskem: 0, Renovasi: 0 };
+        if(!Array.isArray(dbKas)) issues.push("Database transaksi rusak.");
+        if(!Array.isArray(dbAudit)) issues.push("Database audit rusak.");
+
+        [...dbKas].forEach(tx => {
+            if(!tx.id) issues.push("Data tanpa ID terdeteksi.");
+            else if(ids.has(tx.id)) issues.push("ID duplikat terdeteksi: " + tx.id);
+            ids.add(tx.id);
+            if(!tx.tanggal) issues.push("Data tanpa tanggal: " + tx.id);
+            if(tx.nominal === undefined || tx.nominal === null || tx.nominal === "") issues.push("Data tanpa nominal: " + tx.id);
+            if(isNaN(tx.nominal)) issues.push("Nominal bukan angka: " + tx.id);
+            let n = parseInt(tx.nominal) || 0;
+            if(tx.jenis === 'Masuk') saldo[tx.rekening] += n;
+            else if(tx.jenis === 'Keluar') saldo[tx.rekening] -= n;
+            else issues.push("Struktur transaksi tidak lengkap.");
+        });
+
+        if(saldo.Umum < 0) issues.push("Saldo negatif pada Kas Umum.");
+        if(saldo.Soskem < 0) issues.push("Saldo negatif pada Kas Soskem.");
+        if(saldo.Renovasi < 0) issues.push("Saldo negatif pada Kas Renovasi.");
+
+        if(issues.length === 0) { alert("System Health Check : OK"); } 
+        else { alert("Ditemukan " + issues.length + " masalah:\n- " + issues.join("\n- ")); }
+    }
+
+    function saveOnlineConfig() {
+        localStorage.setItem('kasmasjid_gs_url', document.getElementById('config-gs-url').value);
+        localStorage.setItem('kasmasjid_api_key', document.getElementById('config-api-key').value);
+        alert("Konfigurasi API Tersimpan!");
+    }
+
+    function initOnlineConfig() {
+        document.getElementById('config-gs-url').value = localStorage.getItem('kasmasjid_gs_url') || '';
+        document.getElementById('config-api-key').value = localStorage.getItem('kasmasjid_api_key') || '';
+        document.getElementById('sync-time').innerText = localStorage.getItem('kasmasjid_last_sync') || '-';
+        if(localStorage.getItem('kasmasjid_gs_url')) {
+            document.getElementById('sync-status').innerText = 'Ready';
+            document.getElementById('sync-status').style.color = '#10b981';
+        }
+    }
+
+    function generateOnlineSummary() {
+        let summary = { Umum: { saldo: 0, masuk: 0, keluar: 0 }, Soskem: { saldo: 0, masuk: 0, keluar: 0 }, Renovasi: { saldo: 0, masuk: 0, keluar: 0 }, Total: { saldo: 0 } };
+        [...dbKas].forEach(tx => {
+            let n = parseInt(tx.nominal) || 0; let isMasuk = tx.jenis === 'Masuk';
+            if(summary[tx.rekening]) {
+                if(isMasuk) { summary[tx.rekening].masuk += n; summary[tx.rekening].saldo += n; summary.Total.saldo += n; } 
+                else { summary[tx.rekening].keluar += n; summary[tx.rekening].saldo -= n; summary.Total.saldo -= n; }
+            }
+        });
+        return summary;
+    }
+
+    async function pullDataFromGoogle() {
+        let url = localStorage.getItem('kasmasjid_gs_url'); if(!url) return;
+        try {
+            document.getElementById('sync-status').innerText = 'Menarik data...'; document.getElementById('sync-status').style.color = '#f59e0b';
+            const response = await fetch(url + "?action=getPublicData", { method: 'GET' });
+            const data = await response.json();
+            if (data && data.transaksi && data.transaksi.length > 0) {
+                dbKas = data.transaksi.map(tx => ({ id: tx.id || 'TX' + Math.random(), tanggal: tx.tanggal, rekening: tx.rekening, jenis: tx.arus || tx.jenis, nominal: parseInt(tx.nominal) || 0, uraian: tx.keterangan || tx.uraian }));
+                localStorage.setItem('kasmasjid_core_v4', JSON.stringify(dbKas));
+                renderDashboard();
+                document.getElementById('sync-status').innerText = 'Sinkron (Terbaru)'; document.getElementById('sync-status').style.color = '#10b981';
+            } else {
+                document.getElementById('sync-status').innerText = 'Berhasil (Kosong)'; document.getElementById('sync-status').style.color = '#10b981';
+            }
+        } catch(e) { document.getElementById('sync-status').innerText = 'Gagal Tarik Data'; document.getElementById('sync-status').style.color = '#ef4444'; }
+    }
+
+    async function syncGoogleSheets() {
+        let url = localStorage.getItem('kasmasjid_gs_url'); let apiKey = localStorage.getItem('kasmasjid_api_key');
+        if(!url) { document.getElementById('sync-status').innerText = 'Belum Disetel'; document.getElementById('sync-status').style.color = '#ef4444'; return; }
+        document.getElementById('sync-status').innerText = 'Syncing...'; document.getElementById('sync-status').style.color = '#f59e0b';
+        let mappedKas = dbKas.map(tx => ({ id: tx.id, tanggal: tx.tanggal, rekening: tx.rekening, arus: tx.jenis, nominal: tx.nominal, keterangan: tx.uraian }));
+        let mappedAudit = dbAudit.map(log => ({ waktu: log.waktu, aksi: log.aksi, idTransaksi: log.id || '-' }));
+        let payload = { action: 'syncData', apiKey: apiKey || '', summary: generateOnlineSummary(), transaksi: mappedKas, audit: mappedAudit };
+        try {
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+            let now = new Date().toLocaleString('id-ID');
+            localStorage.setItem('kasmasjid_last_sync', now);
+            document.getElementById('sync-time').innerText = now;
+            document.getElementById('sync-count').innerText = mappedKas.length + mappedAudit.length;
+            document.getElementById('sync-status').innerText = 'Berhasil Terhubung'; document.getElementById('sync-status').style.color = '#10b981';
+        } catch(e) { document.getElementById('sync-status').innerText = 'Gagal Sinkron'; document.getElementById('sync-status').style.color = '#ef4444'; }
+    }
+
+    function editTransaksiInit(id) {
+        let tx = [...dbKas].find(t => t.id === id); if(!tx) return;
+        document.getElementById('form-tanggal').value = tx.tanggal; document.getElementById('form-jenis').value = tx.jenis;
+        document.getElementById('form-rekening').value = tx.rekening; document.getElementById('form-nominal').value = tx.nominal;
+        document.getElementById('form-uraian').value = tx.uraian; document.getElementById('form-edit-id').value = tx.id;
+        document.getElementById('judul-form').innerHTML = '<i class="fa fa-edit"></i> Edit Jurnal Transaksi';
+        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-save"></i> Perbarui Transaksi';
+        document.getElementById('btn-simpan').style.background = '#0ea5e9'; document.getElementById('btn-batal-edit').style.display = 'flex';
+        switchView('input');
+        document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.btn-nav')[1].classList.add('active');
+    }
+
+    function batalEditMode() {
+        document.getElementById('form-tanggal').valueAsDate = new Date(); document.getElementById('form-nominal').value = '';
+        document.getElementById('form-uraian').value = ''; document.getElementById('form-edit-id').value = '';
+        document.getElementById('judul-form').innerHTML = '<i class="fa fa-edit"></i> Formulir Jurnal Baru';
+        document.getElementById('btn-simpan').innerHTML = '<i class="fa fa-check-circle"></i> Simpan Transaksi';
+        document.getElementById('btn-simpan').style.background = 'linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%)';
+        document.getElementById('btn-batal-edit').style.display = 'none';
+    }
+
+    function simpanTransaksi() {
+        let tgl = document.getElementById('form-tanggal').value; let jns = document.getElementById('form-jenis').value;
+        let rek = document.getElementById('form-rekening').value; let uraian = document.getElementById('form-uraian').value;
+        let nominal = parseInt(document.getElementById('form-nominal').value); let editId = document.getElementById('form-edit-id').value;
+        
+        if(!tgl) { alert("Tanggal wajib diisi!"); return; } if(!rek) { alert("Rekening wajib dipilih!"); return; }
+        if(isNaN(nominal) || nominal <= 0) { alert("Nominal harus angka dan lebih dari nol!"); return; } if(!uraian) { alert("Uraian wajib diisi!"); return; }
+
+        if(editId !== '') {
+            let index = dbKas.findIndex(t => t.id === editId);
+            if(index !== -1) {
+                dbKas[index] = { id: editId, tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal };
+                catatAudit(`EDIT`, nominal, editId); alert("Perubahan Berhasil Disimpan!"); batalEditMode();
+            }
+        } else {
+            let newId = 'TX' + Date.now();
+            dbKas.push({ id: newId, tanggal: tgl, jenis: jns, rekening: rek, uraian: uraian, nominal: nominal });
+            catatAudit(`TAMBAH`, nominal, newId); alert("Tersimpan!"); 
+        }
+        simpanData(); document.getElementById('form-uraian').value = ''; document.getElementById('form-nominal').value = ''; switchView('dashboard');
+    }
+
+    function hapusTransaksi(id, nominal, jenis) {
+        let pinBatal = prompt("MASUKKAN PIN UNTUK MENGHAPUS TRANSAKSI:");
+        if(pinBatal !== PIN_SISTEM) { alert("PIN Salah. Penghapusan dibatalkan."); return; }
+        if(confirm("Yakin hapus transaksi ini?")) { dbKas = dbKas.filter(tx => tx.id !== id); catatAudit("HAPUS", nominal, id); simpanData(); generateBukuKas(); }
+    }
+
+    function renderDashboard() {
+        let currentM = new Date().getMonth() + 1; let currentY = new Date().getFullYear();
+        let monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('lbl-bulan-ini').innerText = monthNames[currentM-1] + " " + currentY;
+        let inBln = 0, outBln = 0, txCount = 0; let saldoUmum = 0, saldoSoskem = 0, saldoRenovasi = 0;
+
+        [...dbKas].forEach(tx => {
+            let n = parseInt(tx.nominal) || 0;
+            if(tx.rekening === 'Umum') { tx.jenis === 'Masuk' ? saldoUmum += n : saldoUmum -= n; }
+            if(tx.rekening === 'Soskem') { tx.jenis === 'Masuk' ? saldoSoskem += n : saldoSoskem -= n; }
+            if(tx.rekening === 'Renovasi') { tx.jenis === 'Masuk' ? saldoRenovasi += n : saldoRenovasi -= n; }
+            let d = new Date(tx.tanggal);
+            if(d.getMonth() + 1 === currentM && d.getFullYear() === currentY) {
+                if(tx.jenis === 'Masuk') inBln += n;
+                if(tx.jenis === 'Keluar') outBln += n;
+                txCount++;
+            }
+        });
+
+        document.getElementById('dash-total-umum').innerText = 'Rp ' + formatRp(saldoUmum);
+        document.getElementById('dash-total-soskem').innerText = 'Rp ' + formatRp(saldoSoskem);
+        document.getElementById('dash-total-renovasi').innerText = 'Rp ' + formatRp(saldoRenovasi);
+        document.getElementById('dash-in').innerText = 'Rp ' + formatRp(inBln); 
+        document.getElementById('dash-out').innerText = 'Rp ' + formatRp(outBln);
+        document.getElementById('dash-surplus').innerText = 'Rp ' + formatRp(inBln - outBln); 
+        document.getElementById('dash-count').innerText = txCount;
+
+        let sorted = [...dbKas].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 10);
+        let tbody = document.getElementById('tbody-latest'); tbody.innerHTML = '';
+        sorted.forEach(tx => {
+            tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td class="print-only">${tx.rekening}</td><td>${tx.uraian}</td>
+            <td class="print-only">${tx.jenis}</td>
+            <td><span style="color: ${tx.jenis==='Masuk'?'#10b981':'#ef4444'};">Rp ${formatRp(tx.nominal)}</span></td></tr>`;
+        });
+    }
+
+    function generateBukuKas() {
+        let fBulan = parseInt(document.getElementById('filter-bulan').value); let fTahun = parseInt(document.getElementById('filter-tahun').value);
+        let fRek = document.getElementById('filter-rekening').value;
+        let sortedDB = [...dbKas].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+        let saldoAwal = 0, inBulanIni = 0, outBulanIni = 0;
+        let tbody = document.getElementById('tbody-bukukas'); tbody.innerHTML = '';
+
+        sortedDB.forEach(tx => {
+            if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+            let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+            if(tY < fTahun || (tY === fTahun && tM < fBulan)) {
+                if(tx.jenis === 'Masuk') saldoAwal += parseInt(tx.nominal);
+                if(tx.jenis === 'Keluar') saldoAwal -= parseInt(tx.nominal);
+            }
+        });
+
+        let saldoBerjalan = saldoAwal; let hasData = false;
+        
+        sortedDB.forEach(tx => {
+            if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+            let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+            if(tY === fTahun && tM === fBulan) {
+                hasData = true;
+                let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
+                inBulanIni += nIn; outBulanIni += nOut; saldoBerjalan += nIn; saldoBerjalan -= nOut;
+
+                tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                    <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
+                    <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
+                    <td class="no-print action-btns">
+                        <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.id}')"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.id}', ${tx.nominal}, '${tx.jenis}')"><i class="fa fa-trash"></i> Hapus</button>
+                    </td></tr>`;
+            }
+        });
+        if(!hasData) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px !important;">Tidak ada data pada periode ini.</td></tr>`;
+        document.getElementById('buku-awal').innerText = 'Rp ' + formatRp(saldoAwal); document.getElementById('buku-akhir').innerText = 'Rp ' + formatRp(saldoBerjalan);
+    }
+
+    function generateSPT() {
+        let yearSPT = parseInt(document.getElementById('filter-tahun-spt').value);
+        document.getElementById('label-spt-tahun').innerText = yearSPT;
+        let spt = { Umum: { in: 0, out: 0 }, Soskem: { in: 0, out: 0 }, Renovasi: { in: 0, out: 0 }, Total: { in: 0, out: 0 } };
+
+        [...dbKas].forEach(tx => {
+            let d = new Date(tx.tanggal);
+            if(d.getFullYear() === yearSPT) {
+                let n = parseInt(tx.nominal) || 0; let isMasuk = tx.jenis === 'Masuk';
+                if(tx.rekening === 'Umum') { isMasuk ? spt.Umum.in += n : spt.Umum.out += n; }
+                if(tx.rekening === 'Soskem') { isMasuk ? spt.Soskem.in += n : spt.Soskem.out += n; }
+                if(tx.rekening === 'Renovasi') { isMasuk ? spt.Renovasi.in += n : spt.Renovasi.out += n; }
+                isMasuk ? spt.Total.in += n : spt.Total.out += n;
+            }
+        });
+
+        document.getElementById('spt-in-umum').innerText = 'Rp ' + formatRp(spt.Umum.in); document.getElementById('spt-out-umum').innerText = 'Rp ' + formatRp(spt.Umum.out); document.getElementById('spt-surplus-umum').innerText = 'Rp ' + formatRp(spt.Umum.in - spt.Umum.out);
+        document.getElementById('spt-in-soskem').innerText = 'Rp ' + formatRp(spt.Soskem.in); document.getElementById('spt-out-soskem').innerText = 'Rp ' + formatRp(spt.Soskem.out); document.getElementById('spt-surplus-soskem').innerText = 'Rp ' + formatRp(spt.Soskem.in - spt.Soskem.out);
+        document.getElementById('spt-in-renovasi').innerText = 'Rp ' + formatRp(spt.Renovasi.in); document.getElementById('spt-out-renovasi').innerText = 'Rp ' + formatRp(spt.Renovasi.out); document.getElementById('spt-surplus-renovasi').innerText = 'Rp ' + formatRp(spt.Renovasi.in - spt.Renovasi.out);
+        document.getElementById('spt-in-total').innerText = 'Rp ' + formatRp(spt.Total.in); document.getElementById('spt-out-total').innerText = 'Rp ' + formatRp(spt.Total.out); document.getElementById('spt-surplus-total').innerText = 'Rp ' + formatRp(spt.Total.in - spt.Total.out);
+        document.getElementById('spt-content').style.display = 'block';
+    }
+
+    // FUNGSI PERSIAPAN CETAK
+    function setPrintMeta() {
+        let mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let fBulan = parseInt(document.getElementById('filter-bulan').value);
+        let fTahun = document.getElementById('filter-tahun').value;
+        let fRek = document.getElementById('filter-rekening').value;
+        
+        let elPeriode = document.getElementById('print-periode');
+        if(elPeriode) elPeriode.innerText = mNames[fBulan-1] + ' ' + fTahun;
+        
+        let elRek = document.getElementById('print-rekening');
+        if(elRek) elRek.innerText = fRek === 'Semua' ? 'Semua Buku' : ('Kas ' + fRek);
+        
+        let elTahunSPT = document.getElementById('print-spt-tahun');
+        if(elTahunSPT) elTahunSPT.innerText = document.getElementById('filter-tahun-spt').value;
+
+        document.querySelectorAll('.print-date-now').forEach(el => el.innerText = new Date().toLocaleDateString('id-ID'));
+        document.querySelectorAll('.print-operator-name').forEach(el => el.innerText = operatorName);
+    }
+
+    function cetakLaporan() { setPrintMeta(); window.print(); }
+    
+    function cetakSPT() {
+        if(document.getElementById('spt-content').style.display === 'none') { alert("Harap Kalkulasi SPT terlebih dahulu sebelum mencetak!"); return; }
+        setPrintMeta(); window.print(); 
+    }
+
+    function renderAudit() {
+        let tbody = document.getElementById('tbody-audit'); tbody.innerHTML = '';
+        [...dbAudit].reverse().forEach(log => {
+            tbody.innerHTML += `<tr><td>${log.waktu}</td><td><b>${log.operator}</b></td><td>${log.id || '-'}</td><td>${log.aksi}</td><td>Rp ${formatRp(log.nominal)}</td></tr>`;
+        });
+    }
+
+    function exportCSV() {
+        let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Jenis,Rekening,Nominal,Uraian\n";
+        [...dbKas].forEach(function(rowArray) {
+            let row = `${rowArray.id},${rowArray.tanggal},${rowArray.jenis},${rowArray.rekening},${rowArray.nominal},"${rowArray.uraian}"`;
+            csvContent += row + "\r\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a"); link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Data_Kasmasjid_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function restoreAutoBackup() {
+        if(confirm("Yakin ingin memulihkan dari Auto Backup terakhir?")) {
+            try {
+                let backup = JSON.parse(localStorage.getItem('kasmasjid_backup_auto'));
+                if(backup && Array.isArray(backup.core)) {
+                    dbKas = backup.core; dbAudit = backup.audit || []; simpanData();
+                    catatAudit("RESTORE", 0, "AUTO"); alert("Auto Backup berhasil dipulihkan!"); window.location.reload();
+                } else { alert("Auto Backup tidak valid atau kosong."); }
+            } catch(e) { alert("Gagal memulihkan Auto Backup."); }
+        }
+    }
+
+    function backupJSON() {
+        const blob = new Blob([JSON.stringify({ core: dbKas, audit: dbAudit }, null, 2)], { type: "application/json" });
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+        link.download = `Backup_Kasmasjid_${new Date().toISOString().split('T')[0]}.json`; link.click();
+        catatAudit("BACKUP", 0, "-");
+    }
+
+    function restoreJSON(e) {
+        const file = e.target.files[0]; if(!file) return;
+        if(!file.name.toLowerCase().endsWith('.json')) { alert("Format file tidak didukung! Pastikan file berekstensi .json"); return; }
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                let parsed = JSON.parse(evt.target.result);
+                if(parsed.core && Array.isArray(parsed.core)) { 
+                    dbKas = parsed.core; dbAudit = parsed.audit || []; simpanData(); catatAudit("RESTORE", 0, "-"); alert("Restore Berhasil!"); window.location.reload(); 
+                } 
+                else if(Array.isArray(parsed) && parsed.length > 0) {
+                    dbKas = parsed.map(tx => {
+                        let rek = "Umum";
+                        if(tx.alokasiKartu === "Kartu Soskem" || tx.alokasiKartu === "Kartu Sosial" || tx.rekening === "Soskem") rek = "Soskem";
+                        if(tx.alokasiKartu === "Kartu Renovasi" || tx.rekening === "Renovasi") rek = "Renovasi";
+                        return { id: tx.id || 'TX' + Math.random(), tanggal: tx.tanggal, jenis: tx.arus || tx.jenis, rekening: rek, uraian: tx.keterangan || tx.uraian || "Migrasi Data Lama", nominal: parseInt(tx.nominal) || 0 };
+                    });
+                    dbAudit = []; simpanData(); catatAudit("RESTORE", 0, "-"); alert("Migrasi Data Lama Berhasil!"); window.location.reload();
+                } else { alert("Format backup tidak valid!"); }
+            } catch(err) { alert("File JSON Rusak!"); }
+        };
+        reader.readAsText(file);
+    }
+</script>
+</body>
+</html>
