@@ -95,7 +95,9 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- DASHBOARD CARDS LEBIH MEWAH --- */
-        .dashboard-main-balances { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: 25px; }
+        .dashboard-main-balances { display: flex; overflow-x: auto; gap: 15px; margin-bottom: 25px; padding-bottom: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .dashboard-main-balances::-webkit-scrollbar { display: none; }
+        .dashboard-main-balances .account-card { min-width: 85%; scroll-snap-align: center; flex-shrink: 0; }
         .dashboard-activity-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         
         .account-card { border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.15); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; color: white; border: 1px solid rgba(255,255,255,0.2); }
@@ -167,18 +169,19 @@
             #tbody-latest td:nth-child(4), #tbody-audit td:nth-child(4) { display: none !important; }
             #tbody-latest td:nth-child(5), #tbody-audit td:nth-child(5) { width: auto !important; position: absolute; right: 18px; top: 18px; font-size: 15px; font-weight: 800; order: 99; }
 
-            #tbody-bukukas tr { align-items: flex-start; }
-            #tbody-bukukas td:nth-child(2) { font-size: 15px; font-weight: 800; order: 1; margin-bottom: 10px; color: var(--slate-dark); } 
-            #tbody-bukukas td:nth-child(1) { font-size: 12px; color: var(--slate-muted); order: 2; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0 !important; padding-bottom: 12px !important; font-weight: 600; } 
+            #tbody-bukukas tr { align-items: flex-start; padding: 15px; border-radius: 14px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
             #tbody-bukukas td.col-rekening { display: none !important; }
-            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 14px; font-weight: 800; color: #10b981; } 
-            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 14px; font-weight: 800; color: #ef4444; text-align: right; } 
-            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
-            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
-            #tbody-bukukas td:nth-child(6) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
-            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 10px; } 
+            #tbody-bukukas td:nth-child(2) { font-size: 14px; font-weight: 800; order: 1; color: var(--slate-dark); margin-bottom: 2px !important; width: 65% !important; } 
+            #tbody-bukukas td:nth-child(1) { font-size: 11px; color: var(--slate-muted); order: 2; margin-bottom: 12px !important; border-bottom: none !important; padding-bottom: 0 !important; width: 100% !important; } 
+            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 13px; font-weight: 800; color: #10b981; } 
+            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 13px; font-weight: 800; color: #ef4444; text-align: left; } 
+            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px;}
+            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px;}
+            #tbody-bukukas td:nth-child(6) { position: absolute; right: 15px; top: 15px; background: transparent; padding: 0 !important; text-align: right; font-weight: 800; font-size: 14px; color: var(--islamic-green-deep); border: none; width: auto !important; } 
+            #tbody-bukukas td:nth-child(6)::before { content: 'Saldo'; color: var(--slate-muted); font-size: 10px; display: block; margin-bottom: 2px; text-align: right;}
+            #tbody-bukukas td:nth-child(7) { order: 6; width: 100% !important; margin-top: 12px; border-top: 1px dashed #e2e8f0; padding-top: 12px !important; display: flex; gap: 8px; } 
             
-            .btn-sm { padding: 12px; border-radius: 12px; border: none; color: white; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
+            .btn-sm { padding: 10px; border-radius: 8px; font-size: 12px; border: none; color: white; cursor: pointer; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
             .bg-red { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; } 
             .bg-blue { background: #f0f9ff; color: #0ea5e9; border: 1px solid #bae6fd; }
         }
