@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasmasjid V4.8 Cloud Firebase - Pro Edition</title>
+    <title>Kasmasjid V4.9 Cloud Firebase - Pro Edition</title>
     <!-- PWA settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kasmasjid">
-    <link rel="apple-touch-icon" href="logo_icon">
+    <link rel="apple-touch-icon" href="logo_icon.png?v=2026">
     <meta name="theme-color" content="#f3f4f6">
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -236,7 +236,7 @@
 
 <div id="login-screen">
     <div class="login-box">
-        <img src="logo_icon" alt="Logo Masjid">
+        <img src="logo_icon.png?v=2026" alt="Logo Masjid">
         <h2>Otorisasi Sistem Kas</h2>
         <p style="color: var(--slate-muted); margin-bottom: 30px; font-size: 14px; font-weight: 600;">Masukkan PIN Sekretaris</p>
         <input type="password" id="login-pin" placeholder="••••••" onkeypress="if(event.key === 'Enter') cekLogin()">
@@ -252,7 +252,7 @@
     <div class="web-main-header no-print">
         <div class="header-top">
             <div class="header-brand">
-                <img src="logo_icon" alt="Logo Masjid" class="header-logo-img">
+                <img src="logo_icon.png?v=2026" alt="Logo Masjid" class="header-logo-img">
                 <div class="header-text">
                     <h1>Kas Al-Ikhlash</h1>
                     <p><i class="fa fa-cloud" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Cloud Firebase Realtime</span></p>
@@ -264,7 +264,7 @@
         </div>
         <div class="marquee-container">
             <span class="marquee-text">
-                Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure Firebase Cloud <i class="fa fa-star-and-crescent"></i> Al-Ikhlash Financial Core System
+                Al-Ikhlash Financial Core System <i class="fa fa-shield-alt"></i> Secure Firebase Cloud & RR Software By A.HR <i class="fa fa-star-and-crescent"></i> Al-Ikhlash Financial Core System
             </span>
         </div>
     </div>
@@ -699,20 +699,28 @@
     function renderAdminChart() {
         let ctx = document.getElementById('adminChartBar');
         if(!ctx) return;
-        let months = {};
+        
+        let monthsMap = {};
+        // Kumpulkan data dan kelompokkan berdasarkan key YYYY-MM agar bisa di-sort kronologis
         [...window.dbKas].forEach(tx => {
             let d = new Date(tx.tanggal);
             if(isNaN(d)) return;
+            let sortKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
             let mLabel = d.toLocaleString('id-ID', { month: 'short', year: 'numeric' });
-            if(!months[mLabel]) months[mLabel] = { masuk: 0, keluar: 0 };
+            
+            if(!monthsMap[sortKey]) {
+                monthsMap[sortKey] = { label: mLabel, masuk: 0, keluar: 0 };
+            }
             let n = parseInt(tx.nominal) || 0;
-            if(tx.jenis === 'Masuk') months[mLabel].masuk += n;
-            else if(tx.jenis === 'Keluar') months[mLabel].keluar += n;
+            if(tx.jenis === 'Masuk') monthsMap[sortKey].masuk += n;
+            else if(tx.jenis === 'Keluar') monthsMap[sortKey].keluar += n;
         });
 
-        let labels = Object.keys(months);
-        let dataMasuk = labels.map(l => months[l].masuk);
-        let dataKeluar = labels.map(l => months[l].keluar);
+        // Urutkan berdasarkan kunci waktu (kronologis dari yang terlama ke terbaru)
+        let sortedKeys = Object.keys(monthsMap).sort();
+        let labels = sortedKeys.map(k => monthsMap[k].label);
+        let dataMasuk = sortedKeys.map(k => monthsMap[k].masuk);
+        let dataKeluar = sortedKeys.map(k => monthsMap[k].keluar);
 
         if(adminChartInstance) adminChartInstance.destroy();
         adminChartInstance = new Chart(ctx, {
@@ -724,7 +732,14 @@
                     { label: 'Pengeluaran', data: dataKeluar, backgroundColor: '#ef4444', borderRadius: 6 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    y: { ticks: { callback: function(value) { return 'Rp ' + new Intl.NumberFormat('id-ID').format(value); } } }
+                }
+            }
         });
     }
 
@@ -732,12 +747,21 @@
         setTimeout(() => { renderAdminChart(); }, 200);
     }
 
-    // FUNGSI CETAK DIAGRAM KHUSUS
+    // FUNGSI CETAK DIAGRAM KHUSUS DENGAN DESKRIPSI RINGKASAN
     window.cetakDiagramTransaksi = function() {
         let printWindow = window.open('', '_blank');
         let chartCanvas = document.getElementById('adminChartBar');
         let chartImageUrl = chartCanvas ? chartCanvas.toDataURL('image/png') : '';
         
+        // Hitung total keseluruhan untuk deskripsi ringkasan
+        let totalMasukAll = 0;
+        let totalKeluarAll = 0;
+        [...window.dbKas].forEach(tx => {
+            let n = parseInt(tx.nominal) || 0;
+            if(tx.jenis === 'Masuk') totalMasukAll += n;
+            else if(tx.jenis === 'Keluar') totalKeluarAll += n;
+        });
+
         printWindow.document.write(`
             <!DOCTYPE html>
             <html lang="id">
@@ -747,18 +771,39 @@
                 <style>
                     body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 30px; color: #0f172a; text-align: center; }
                     h1 { font-family: 'Cinzel', serif; font-size: 22px; color: #064e3b; margin-bottom: 5px; }
-                    h2 { font-size: 14px; color: #64748b; margin-bottom: 30px; text-transform: uppercase; }
-                    .chart-box { max-width: 700px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 20px; border-radius: 12px; }
+                    h2 { font-size: 14px; color: #64748b; margin-bottom: 20px; text-transform: uppercase; }
+                    .summary-box { display: flex; justify-content: space-around; margin-bottom: 20px; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; background: #f8fafc; }
+                    .summary-item span { display: block; font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase; }
+                    .summary-item b { font-size: 15px; }
+                    .txt-in { color: #10b981; }
+                    .txt-out { color: #ef4444; }
+                    .chart-box { max-width: 750px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; }
                     img { width: 100%; height: auto; }
-                    .footer { margin-top: 50px; display: flex; justify-content: flex-end; }
+                    .footer { margin-top: 40px; display: flex; justify-content: flex-end; }
                     .sign { text-align: center; width: 200px; }
-                    .sign p { font-size: 12px; margin: 5px 0; }
-                    .line { margin-top: 60px; border-bottom: 1px solid black; font-weight: bold; }
+                    .sign p { font-size: 12px; margin: 3px 0; }
+                    .line { margin-top: 50px; border-bottom: 1px solid black; font-weight: bold; }
                 </style>
             </head>
             <body>
                 <h1>DKM JAMI AL-IKHLASH</h1>
                 <h2>DIAGRAM VISUALISASI SIRKULASI KAS KEUANGAN</h2>
+                
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <span>Akumulasi Pemasukan</span>
+                        <b class="txt-in">Rp ${new Intl.NumberFormat('id-ID').format(totalMasukAll)}</b>
+                    </div>
+                    <div class="summary-item">
+                        <span>Akumulasi Pengeluaran</span>
+                        <b class="txt-out">Rp ${new Intl.NumberFormat('id-ID').format(totalKeluarAll)}</b>
+                    </div>
+                    <div class="summary-item">
+                        <span>Net Saldo Kas</span>
+                        <b>Rp ${new Intl.NumberFormat('id-ID').format(totalMasukAll - totalKeluarAll)}</b>
+                    </div>
+                </div>
+
                 <div class="chart-box">
                     <img src="${chartImageUrl}" alt="Grafik Sirkulasi Kas">
                 </div>
