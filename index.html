@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasmasjid V4.5 Cloud Firebase - Secure</title>
+    <title>Kasmasjid V4.8 Cloud Firebase - Pro Edition</title>
     <!-- PWA settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kasmasjid">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063185.png">
+    <link rel="apple-touch-icon" href="logo_icon">
     <meta name="theme-color" content="#f3f4f6">
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js untuk Grafik Diagram Transaksi -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
@@ -33,7 +35,7 @@
 
         body {
             background-color: var(--system-bg);
-            background-image: radial-gradient(at 0% 0%, rgba(15, 118, 110, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(217, 119, 6, 0.05) 0px, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, rgba(15, 118, 110, 0.06) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(217, 119, 6, 0.06) 0px, transparent 50%);
             color: var(--slate-dark);
             min-height: 100vh;
             padding: 20px;
@@ -48,6 +50,7 @@
             display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
         .login-box { background: white; padding: 40px 30px; border-radius: var(--radius-premium); text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .login-box img { width: 70px; height: 70px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 2px solid var(--islamic-gold); }
         .login-box h2 { color: var(--islamic-green-deep); margin-bottom: 10px; font-family: 'Cinzel', serif; font-size: 22px;}
         .login-box input { width: 100%; padding: 18px; border: 2px solid #e2e8f0; border-radius: var(--radius-md); background: #f8fafc; margin-bottom: 20px; font-size: 20px; text-align: center; font-weight: 800; letter-spacing: 8px; }
         .login-box input:focus { border-color: var(--islamic-green-mint); outline: none; background: white;}
@@ -56,30 +59,32 @@
         #app-container { display: none; max-width: 1200px; margin: 0 auto; }
 
         /* --- APP HEADER --- */
-        .web-main-header { background: var(--premium-pearl); padding: 15px 20px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); margin-bottom: 25px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .header-brand { display: flex; align-items: center; gap: 15px; }
-        .header-icon { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-size: 22px; box-shadow: 0 4px 10px rgba(6, 78, 59, 0.2); }
-        .header-text h1 { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: var(--islamic-green-deep); }
-        .header-text p { font-size: 12px; color: var(--slate-muted); margin-top: 2px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .web-main-header { background: var(--premium-pearl); padding: 18px 22px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); margin-bottom: 25px; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.8); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .header-brand { display: flex; align-items: center; gap: 16px; }
+        .header-logo-img { width: 52px; height: 52px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(6, 78, 59, 0.2); border: 2px solid var(--islamic-green-mint); }
+        .header-text h1 { font-family: 'Cinzel', serif; font-size: 19px; font-weight: 800; color: var(--islamic-green-deep); }
+        .header-text p { font-size: 12px; color: var(--slate-muted); margin-top: 3px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .header-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-logout { background: #fef2f2; color: #ef4444; width: 40px; height: 40px; border-radius: 12px; border: none; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-logout { background: #fef2f2; color: #ef4444; width: 42px; height: 42px; border-radius: 14px; border: none; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .btn-logout:hover { background: #fee2e2; }
 
         /* --- RUNNING TEXT --- */
-        .marquee-container { width: 100%; background: #f1f5f9; border-radius: 8px; padding: 6px 10px; overflow: hidden; white-space: nowrap; position: relative; border-left: 3px solid var(--islamic-green-mint); }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; font-size: 11px; font-weight: 700; color: var(--slate-dark); text-transform: uppercase; letter-spacing: 1px; }
-        .marquee-text i { color: var(--islamic-gold); margin: 0 5px; }
+        .marquee-container { width: 100%; background: #f1f5f9; border-radius: 10px; padding: 8px 12px; overflow: hidden; white-space: nowrap; position: relative; border-left: 3px solid var(--islamic-green-mint); }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 11px; font-weight: 700; color: var(--slate-dark); text-transform: uppercase; letter-spacing: 1px; }
+        .marquee-text i { color: var(--islamic-gold); margin: 0 6px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         /* --- NAVIGASI TOOLS (ATAS) --- */
         .nav-bar-tools { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; -ms-overflow-style: none; scrollbar-width: none; }
         .nav-bar-tools::-webkit-scrollbar { display: none; }
         .btn-nav { background: white; color: var(--slate-muted); border: 1px solid #e2e8f0; padding: 12px 18px; font-size: 13px; font-weight: 700; border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
+        .btn-nav:hover { border-color: var(--islamic-green-mint); color: var(--islamic-green-deep); }
         
         /* --- NAVIGASI UTAMA (BOTTOM NAV MOBILE) --- */
         .mobile-bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
             display: flex; justify-content: space-around; align-items: center;
             padding: 15px 5px 25px 5px; z-index: 1000; border-top-left-radius: 30px; border-top-right-radius: 30px; border-top: 1px solid rgba(255,255,255,0.5);
         }
@@ -88,18 +93,18 @@
         .mobile-bottom-nav .btn-nav.active { color: var(--islamic-green-deep); }
         .mobile-bottom-nav .btn-nav.active i { transform: translateY(-4px) scale(1.1); color: var(--islamic-green-mint); }
 
-        .operator-input { padding: 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 13px; outline: none; background: white; min-width: 150px; }
+        .operator-input { padding: 12px 15px; border-radius: 14px; border: 1px solid #e2e8f0; font-weight: 700; font-size: 13px; outline: none; background: white; min-width: 150px; }
 
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- DASHBOARD CARDS ELEGAN TERSUSUN KE BAWAH --- */
         .dashboard-main-balances { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: 25px; }
         .dashboard-activity-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         
-        .account-card { border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.15); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; color: white; border: 1px solid rgba(255,255,255,0.2); }
-        .account-card::after { font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -15px; bottom: -20px; font-size: 120px; opacity: 0.1; line-height: 1; }
+        .account-card { border-radius: var(--radius-premium); padding: 28px 24px; box-shadow: 0 15px 35px -10px rgba(6, 78, 59, 0.12); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .account-card::after { font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -15px; bottom: -20px; font-size: 120px; opacity: 0.08; line-height: 1; }
         
         .card-umum { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); } .card-umum::after { content: '\f66f'; }
         .card-soskem { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); } .card-soskem::after { content: '\f4c4'; }
@@ -108,7 +113,7 @@
         .account-card span.label-text { font-size: 12px; opacity: 0.9; font-weight: 600; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .account-card h2.balance-amount { font-size: 32px; font-weight: 800; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        .card-activity { background: white; color: var(--slate-dark); box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; padding: 20px; border-radius: var(--radius-premium); }
+        .card-activity { background: white; color: var(--slate-dark); box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; padding: 22px; border-radius: var(--radius-premium); }
         .card-activity span.label-text { color: var(--slate-muted); }
         .card-activity h2.balance-amount { font-size: 22px; text-shadow: none; }
         
@@ -117,16 +122,17 @@
         .section-title { font-size: 16px; font-weight: 800; color: var(--slate-dark); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
         .section-title i { color: var(--islamic-green-mint); }
 
-        .workspace-banking-card { background: white; border-radius: var(--radius-premium); padding: 25px 20px; box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; margin-bottom: 25px; }
+        .workspace-banking-card { background: white; border-radius: var(--radius-premium); padding: 28px 24px; box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; margin-bottom: 25px; }
         
         .filter-controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; background: #f8fafc; padding: 18px; border-radius: var(--radius-premium); border: 1px solid #e2e8f0; }
-        .filter-controls select, .filter-controls input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 600; outline: none; background: white; appearance: none; }
+        .filter-controls select, .filter-controls input { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 600; outline: none; background: white; appearance: none; }
         
-        .btn-action, .btn-print, .btn-warning, .btn-success, .btn-teal { width: 100%; padding: 15px; font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s;}
+        .btn-action, .btn-print, .btn-warning, .btn-success, .btn-teal { width: 100%; padding: 16px; font-size: 14px; font-weight: 700; border-radius: 14px; cursor: pointer; border: none; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s;}
         .btn-action { background: linear-gradient(135deg, var(--islamic-green-mint) 0%, var(--islamic-green-deep) 100%); }
         .btn-print { background: var(--slate-dark); }
         .btn-warning { background: #f59e0b; }
         .btn-success { background: #10b981; }
+        .btn-teal { background: var(--islamic-green-mint); }
         
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
@@ -139,6 +145,11 @@
         .spt-box h4 { border-bottom: 2px dashed #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; color: var(--slate-dark); font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;}
         .spt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--slate-muted); }
         .spt-row.total { font-weight: 800; font-size: 16px; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 10px; color: var(--islamic-green-deep); }
+
+        /* CONTAINER DIAGRAM KHUSUS */
+        .chart-section-box { background: white; padding: 24px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); border: 1px solid #f1f5f9; margin-bottom: 25px; }
+        .chart-container-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .chart-card-item { background: #f8fafc; padding: 18px; border-radius: 16px; border: 1px solid #e2e8f0; position: relative; height: 320px; }
 
         /* HIDE SCROLLBARS FOR CLEANER LOOK */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -179,6 +190,7 @@
 
         /* =========================================
            PENGATURAN KHUSUS CETAK PDF / KERTAS A4
+           (100% AMAN & TIDAK DIUBAH FORMAT LAPORANNYA)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 15mm; }
@@ -197,7 +209,7 @@
             th, td { display: table-cell !important; border: 1px solid black !important; padding: 8px !important; font-size: 12px !important; text-align: left !important; width: auto !important; }
             th { background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; color: black !important; font-weight: bold !important; text-transform: uppercase; }
 
-            .workspace-banking-card, .summary-box, .spt-box, .dashboard-activity-balances { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
+            .workspace-banking-card, .summary-box, .spt-box, .dashboard-activity-balances, .chart-section-box { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
             
             .print-header { text-align: center; border-bottom: 4px double black; margin-bottom: 20px; padding-bottom: 15px; }
             .print-header h1 { font-family: 'Cinzel', serif; font-size: 24px; color: black; margin: 0 0 5px 0; }
@@ -224,7 +236,7 @@
 
 <div id="login-screen">
     <div class="login-box">
-        <i class="fa fa-mosque" style="font-size: 55px; color: var(--islamic-green-deep); margin-bottom: 25px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));"></i>
+        <img src="logo_icon" alt="Logo Masjid">
         <h2>Otorisasi Sistem Kas</h2>
         <p style="color: var(--slate-muted); margin-bottom: 30px; font-size: 14px; font-weight: 600;">Masukkan PIN Sekretaris</p>
         <input type="password" id="login-pin" placeholder="••••••" onkeypress="if(event.key === 'Enter') cekLogin()">
@@ -240,7 +252,7 @@
     <div class="web-main-header no-print">
         <div class="header-top">
             <div class="header-brand">
-                <div class="header-icon"><i class="fa fa-mosque"></i></div>
+                <img src="logo_icon" alt="Logo Masjid" class="header-logo-img">
                 <div class="header-text">
                     <h1>Kas Al-Ikhlash</h1>
                     <p><i class="fa fa-cloud" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Cloud Firebase Realtime</span></p>
@@ -371,6 +383,21 @@
                 </div>
             </div>
 
+            <!-- TOMBOL KHUSUS CETAK DIAGRAM / GRAFIK TRANSAKSI -->
+            <div class="no-print" style="margin-bottom: 25px;">
+                <button class="btn-teal" onclick="cetakDiagramTransaksi()"><i class="fa fa-chart-pie"></i> Cetak Diagram & Grafik Analitik</button>
+            </div>
+
+            <!-- CONTAINER GRAFIK DIAGRAM (TAMPIL DI ADMIN & DAPAT DICETAK) -->
+            <div class="chart-section-box">
+                <div class="section-title"><i class="fa fa-chart-bar"></i> Visualisasi Grafik Sirkulasi Kas</div>
+                <div class="chart-container-grid">
+                    <div class="chart-card-item">
+                        <canvas id="adminChartBar"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div class="print-saldo-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                 <div class="print-saldo-box" style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;">
                     <span style="font-size: 11px; font-weight: 700; color: var(--slate-muted); display: block; margin-bottom: 5px;">SALDO AWAL</span>
@@ -492,6 +519,7 @@
     window.dbKas = [];
     window.dbAudit = [];
     window.operatorName = "Sekretaris";
+    let adminChartInstance = null;
 
     window.cekLogin = function() {
         if(document.getElementById('login-pin').value === PIN_SISTEM) {
@@ -528,6 +556,7 @@
                 window.dbKas.push({ firebaseId: docSnap.id, ...docSnap.data() });
             });
             renderDashboard();
+            renderAdminChart();
         });
 
         onSnapshot(collection(db, "audit"), (snapshot) => {
@@ -548,6 +577,7 @@
         document.getElementById('view-' + viewId).classList.add('active');
         event.currentTarget.classList.add('active');
         if(viewId === 'dashboard') renderDashboard();
+        if(viewId === 'bukukas') { renderBukuKasChart(); }
         if(viewId === 'audit') renderAudit();
     }
 
@@ -666,6 +696,88 @@
         });
     }
 
+    function renderAdminChart() {
+        let ctx = document.getElementById('adminChartBar');
+        if(!ctx) return;
+        let months = {};
+        [...window.dbKas].forEach(tx => {
+            let d = new Date(tx.tanggal);
+            if(isNaN(d)) return;
+            let mLabel = d.toLocaleString('id-ID', { month: 'short', year: 'numeric' });
+            if(!months[mLabel]) months[mLabel] = { masuk: 0, keluar: 0 };
+            let n = parseInt(tx.nominal) || 0;
+            if(tx.jenis === 'Masuk') months[mLabel].masuk += n;
+            else if(tx.jenis === 'Keluar') months[mLabel].keluar += n;
+        });
+
+        let labels = Object.keys(months);
+        let dataMasuk = labels.map(l => months[l].masuk);
+        let dataKeluar = labels.map(l => months[l].keluar);
+
+        if(adminChartInstance) adminChartInstance.destroy();
+        adminChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Pemasukan', data: dataMasuk, backgroundColor: '#10b981', borderRadius: 6 },
+                    { label: 'Pengeluaran', data: dataKeluar, backgroundColor: '#ef4444', borderRadius: 6 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    window.renderBukuKasChart = function() {
+        setTimeout(() => { renderAdminChart(); }, 200);
+    }
+
+    // FUNGSI CETAK DIAGRAM KHUSUS
+    window.cetakDiagramTransaksi = function() {
+        let printWindow = window.open('', '_blank');
+        let chartCanvas = document.getElementById('adminChartBar');
+        let chartImageUrl = chartCanvas ? chartCanvas.toDataURL('image/png') : '';
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="id">
+            <head>
+                <meta charset="UTF-8">
+                <title>Cetak Diagram Transaksi - DKM Al-Ikhlash</title>
+                <style>
+                    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 30px; color: #0f172a; text-align: center; }
+                    h1 { font-family: 'Cinzel', serif; font-size: 22px; color: #064e3b; margin-bottom: 5px; }
+                    h2 { font-size: 14px; color: #64748b; margin-bottom: 30px; text-transform: uppercase; }
+                    .chart-box { max-width: 700px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 20px; border-radius: 12px; }
+                    img { width: 100%; height: auto; }
+                    .footer { margin-top: 50px; display: flex; justify-content: flex-end; }
+                    .sign { text-align: center; width: 200px; }
+                    .sign p { font-size: 12px; margin: 5px 0; }
+                    .line { margin-top: 60px; border-bottom: 1px solid black; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h1>DKM JAMI AL-IKHLASH</h1>
+                <h2>DIAGRAM VISUALISASI SIRKULASI KAS KEUANGAN</h2>
+                <div class="chart-box">
+                    <img src="${chartImageUrl}" alt="Grafik Sirkulasi Kas">
+                </div>
+                <div class="footer">
+                    <div class="sign">
+                        <p>Dicetak pada: ${new Date().toLocaleDateString('id-ID')}</p>
+                        <p>Sekretaris DKM</p>
+                        <div class="line">Sekretaris</div>
+                    </div>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
     window.generateBukuKas = function() {
         let fBulan = parseInt(document.getElementById('filter-bulan').value); let fTahun = parseInt(document.getElementById('filter-tahun').value);
         let fRek = document.getElementById('filter-rekening').value;
@@ -779,7 +891,6 @@
         link.download = `Backup_Kasmasjid_${new Date().toISOString().split('T')[0]}.json`; link.click();
     }
 
-    // FUNGSI RESTORE YANG SUDAH DIPERKUAT (BISA BACA SEGALA FORMAT JSON LAMA/BARU)
     window.restoreJSON = function(e) {
         const file = e.target.files[0]; if(!file) return;
         const reader = new FileReader();
@@ -787,8 +898,6 @@
             try {
                 let rawData = JSON.parse(evt.target.result);
                 let arrayData = [];
-
-                // Deteksi otomatis struktur file JSON
                 if (Array.isArray(rawData)) {
                     arrayData = rawData;
                 } else if (rawData.core && Array.isArray(rawData.core)) {
@@ -806,7 +915,6 @@
 
                 let count = 0;
                 for(let tx of arrayData) {
-                    // Normalisasi data agar sesuai dengan format Cloud Firestore
                     let cleanTx = {
                         id: tx.id || 'TX' + Math.random(),
                         tanggal: tx.tanggal || new Date().toISOString().split('T')[0],
@@ -815,7 +923,6 @@
                         nominal: parseInt(tx.nominal) || 0,
                         uraian: tx.uraian || tx.keterangan || 'Data Migrasi'
                     };
-                    
                     await addDoc(collection(db, "transaksi"), cleanTx);
                     count++;
                 }
