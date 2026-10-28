@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063185.png">
     <meta name="theme-color" content="#f3f4f6">
     
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -140,12 +140,6 @@
         .spt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600; color: var(--slate-muted); }
         .spt-row.total { font-weight: 800; font-size: 16px; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 10px; color: var(--islamic-green-deep); }
 
-        /* SYNC ONLINE STYLES */
-        .sync-dashboard { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
-        .sync-card { background: white; padding: 20px; border-radius: var(--radius-premium); box-shadow: var(--banking-shadow); text-align: left; border: 1px solid #f1f5f9; border-left: 5px solid #3b82f6; }
-        .sync-card h3 { font-size: 12px; color: var(--slate-muted); margin-bottom: 5px; font-weight: 700; }
-        .sync-card .val { font-size: 18px; font-weight: 800; color: var(--slate-dark); }
-
         /* HIDE SCROLLBARS FOR CLEANER LOOK */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .print-only { display: none; }
@@ -185,7 +179,6 @@
 
         /* =========================================
            PENGATURAN KHUSUS CETAK PDF / KERTAS A4
-           (TIDAK ADA YANG DIUBAH, 100% AMAN)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 15mm; }
@@ -481,7 +474,7 @@
 <!-- FIREBASE SDK & CORE APPLICATION SCRIPT -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBUSdGMAK1snoB8berOI2MOePu49iCWuqM",
@@ -529,7 +522,6 @@
         document.getElementById('filter-bulan').value = new Date().getMonth() + 1;
         document.getElementById('form-tanggal').valueAsDate = new Date();
 
-        // Realtime Listener dari Firestore Firebase
         onSnapshot(collection(db, "transaksi"), (snapshot) => {
             window.dbKas = [];
             snapshot.forEach((docSnap) => {
@@ -787,20 +779,52 @@
         link.download = `Backup_Kasmasjid_${new Date().toISOString().split('T')[0]}.json`; link.click();
     }
 
+    // FUNGSI RESTORE YANG SUDAH DIPERKUAT (BISA BACA SEGALA FORMAT JSON LAMA/BARU)
     window.restoreJSON = function(e) {
         const file = e.target.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = async function(evt) {
             try {
-                let parsed = JSON.parse(evt.target.result);
-                if(parsed.core && Array.isArray(parsed.core)) {
-                    for(let tx of parsed.core) {
-                        delete tx.firebaseId;
-                        await addDoc(collection(db, "transaksi"), tx);
-                    }
-                    alert("Restore & Sinkronisasi ke Cloud Berhasil!"); window.location.reload(); 
-                } else { alert("Format file backup tidak valid!"); }
-            } catch(err) { alert("Gagal memproses file JSON!"); }
+                let rawData = JSON.parse(evt.target.result);
+                let arrayData = [];
+
+                // Deteksi otomatis struktur file JSON
+                if (Array.isArray(rawData)) {
+                    arrayData = rawData;
+                } else if (rawData.core && Array.isArray(rawData.core)) {
+                    arrayData = rawData.core;
+                } else if (rawData.transaksi && Array.isArray(rawData.transaksi)) {
+                    arrayData = rawData.transaksi;
+                } else {
+                    throw new Error("Struktur file JSON tidak dikenali.");
+                }
+
+                if (arrayData.length === 0) {
+                    alert("File JSON kosong, tidak ada data untuk dipulihkan.");
+                    return;
+                }
+
+                let count = 0;
+                for(let tx of arrayData) {
+                    // Normalisasi data agar sesuai dengan format Cloud Firestore
+                    let cleanTx = {
+                        id: tx.id || 'TX' + Math.random(),
+                        tanggal: tx.tanggal || new Date().toISOString().split('T')[0],
+                        jenis: tx.jenis || tx.arus || 'Masuk',
+                        rekening: tx.rekening || (tx.alokasiKartu?.includes('Soskem') ? 'Soskem' : 'Umum'),
+                        nominal: parseInt(tx.nominal) || 0,
+                        uraian: tx.uraian || tx.keterangan || 'Data Migrasi'
+                    };
+                    
+                    await addDoc(collection(db, "transaksi"), cleanTx);
+                    count++;
+                }
+
+                alert(`Berhasil memulihkan dan mengunggah ${count} data transaksi ke Cloud Firebase!`); 
+                window.location.reload(); 
+            } catch(err) { 
+                alert("Gagal memproses file JSON: " + err.message); 
+            }
         };
         reader.readAsText(file);
     }
