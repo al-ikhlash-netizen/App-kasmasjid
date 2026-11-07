@@ -180,15 +180,16 @@
             #tbody-latest td:nth-child(5), #tbody-audit td:nth-child(5) { width: auto !important; position: absolute; right: 18px; top: 18px; font-size: 15px; font-weight: 800; order: 99; }
 
             #tbody-bukukas tr { align-items: flex-start; }
-            #tbody-bukukas td:nth-child(2) { font-size: 15px; font-weight: 800; order: 1; margin-bottom: 10px; color: var(--slate-dark); } 
+            #tbody-bukukas td:nth-child(2) { width: 40px !important; order: 0; } /* Checkbox */
+            #tbody-bukukas td:nth-child(3) { font-size: 15px; font-weight: 800; order: 1; margin-bottom: 10px; color: var(--slate-dark); width: calc(100% - 40px) !important; } 
             #tbody-bukukas td:nth-child(1) { font-size: 12px; color: var(--slate-muted); order: 2; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0 !important; padding-bottom: 12px !important; font-weight: 600; } 
             #tbody-bukukas td.col-rekening { display: none !important; }
-            #tbody-bukukas td:nth-child(4) { width: 50% !important; order: 3; font-size: 14px; font-weight: 800; color: #10b981; } 
-            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 4; font-size: 14px; font-weight: 800; color: #ef4444; text-align: right; } 
-            #tbody-bukukas td:nth-child(4)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
-            #tbody-bukukas td:nth-child(5)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
-            #tbody-bukukas td:nth-child(6) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
-            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; } 
+            #tbody-bukukas td:nth-child(5) { width: 50% !important; order: 3; font-size: 14px; font-weight: 800; color: #10b981; } 
+            #tbody-bukukas td:nth-child(6) { width: 50% !important; order: 4; font-size: 14px; font-weight: 800; color: #ef4444; text-align: right; } 
+            #tbody-bukukas td:nth-child(5)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(6)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
+            #tbody-bukukas td:nth-child(7) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
+            #tbody-bukukas td:nth-child(8) { order: 6; margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; } 
             
             .btn-sm { padding: 10px 12px; border-radius: 10px; border: none; color: white; cursor: pointer; font-size: 12px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; }
             .bg-red { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; } 
@@ -435,6 +436,11 @@
                     <button class="btn-print" style="flex: 1;" onclick="cetakLaporan()"><i class="fa fa-file-pdf"></i> PDF</button>
                     <button class="btn-success" style="flex: 1;" onclick="exportCSV()"><i class="fa fa-file-excel"></i> CSV</button>
                 </div>
+            </div>
+
+            <!-- TOMBOL CETAK 3 NOTA PILIHAN (BERBEDA) -->
+            <div class="no-print" style="margin-bottom: 15px;">
+                <button class="btn-warning" onclick="cetakMultiKwitansi()"><i class="fa fa-receipt"></i> 🖨️ Cetak Nota Pilihan (Maks 3 Transaksi Berbeda)</button>
             </div>
 
             <!-- TOMBOL KHUSUS CETAK DIAGRAM / GRAFIK TRANSAKSI -->
@@ -750,43 +756,71 @@
         }
     }
 
-    // FITUR CETAK KWITANSI INDIVIDUAL (Dibuat Kompak agar 3 Kwitansi pas dalam 1 Halaman A4)
+    // FITUR CETAK KWITANSI INDIVIDUAL (1 Transaksi)
     window.cetakKwitansi = function(firebaseId) {
         let tx = [...window.dbKas].find(t => t.firebaseId === firebaseId);
         if(!tx) return;
+        renderPrintKwitansi([tx]);
+    }
 
+    // FITUR CETAK MULTI-KWITANSI (Hingga 3 Transaksi Berbeda dalam 1 Halaman A4, ttd Bendahara & Sekretaris saja)
+    window.cetakMultiKwitansi = function() {
+        let checkboxes = document.querySelectorAll('.print-kwitansi-cb:checked');
+        if(checkboxes.length === 0) {
+            alert("Silakan centang minimal 1 transaksi pada tabel Buku Kas di bawah terlebih dahulu!");
+            return;
+        }
+        if(checkboxes.length > 3) {
+            alert("Maksimal 3 transaksi yang dapat dipilih sekaligus dalam 1 halaman cetak!");
+            return;
+        }
+
+        let selectedTxs = [];
+        checkboxes.forEach(cb => {
+            let fId = cb.getAttribute('data-id');
+            let tx = [...window.dbKas].find(t => t.firebaseId === fId);
+            if(tx) selectedTxs.push(tx);
+        });
+
+        renderPrintKwitansi(selectedTxs);
+    }
+
+    function renderPrintKwitansi(txArray) {
         let printWin = window.open('', '_blank');
-        printWin.document.write(`
+        let htmlContent = `
             <!DOCTYPE html>
             <html lang="id">
             <head>
                 <meta charset="UTF-8">
-                <title>Kwitansi Transaksi - DKM Al-Ikhlash</title>
+                <title>Kwitansi Resmi - DKM Al-Ikhlash</title>
                 <style>
                     @page { size: A4 portrait; margin: 10mm; }
                     body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 10px; color: #0f172a; margin: 0; }
-                    .receipt-box { border: 1.5px solid #064e3b; padding: 14px; border-radius: 12px; max-width: 100%; margin-bottom: 15px; background: #fff; page-break-inside: avoid; }
-                    .header { text-align: center; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 8px; margin-bottom: 10px; }
-                    .header h2 { font-family: 'Cinzel', serif; color: #064e3b; margin: 0 0 2px 0; font-size: 15px; }
+                    .receipt-box { border: 1.5px solid #064e3b; padding: 14px; border-radius: 12px; max-width: 100%; margin-bottom: 12px; background: #fff; page-break-inside: avoid; }
+                    .header { text-align: center; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 8px; margin-bottom: 8px; }
+                    .header h2 { font-family: 'Cinzel', serif; color: #064e3b; margin: 0 0 2px 0; font-size: 14px; }
                     .header p { font-size: 9px; color: #64748b; margin: 0; }
-                    .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+                    .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; }
                     .row b { color: #0f172a; }
-                    .amount-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px; border-radius: 8px; margin: 10px 0; text-align: center; }
+                    .amount-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px; border-radius: 8px; margin: 8px 0; text-align: center; }
                     .amount-box span { font-size: 9px; color: #166534; font-weight: bold; text-transform: uppercase; display: block; }
-                    .amount-box h3 { font-size: 18px; color: #15803d; margin: 3px 0 0 0; }
-                    .footer { margin-top: 15px; display: flex; justify-content: space-between; }
-                    .sign-box { text-align: center; width: 30%; }
-                    .sign-box p { font-size: 9px; margin: 1px 0; }
-                    .sign-line { margin-top: 30px; font-weight: bold; text-decoration: underline; font-size: 9px; }
+                    .amount-box h3 { font-size: 16px; color: #15803d; margin: 2px 0 0 0; }
+                    .footer { margin-top: 10px; display: flex; justify-content: space-between; }
+                    .sign-box { text-align: center; width: 45%; }
+                    .sign-box p { font-size: 10px; margin: 1px 0; }
+                    .sign-line { margin-top: 30px; font-weight: bold; text-decoration: underline; font-size: 10px; }
                 </style>
             </head>
             <body>
-                <!-- Kwitansi 1 -->
+        `;
+
+        txArray.forEach((tx, idx) => {
+            htmlContent += `
                 <div class="receipt-box">
                     <div class="header">
                         <h2>DKM JAMI AL-IKHLASH</h2>
                         <p>Kp. Ciborerang, Desa Sangkanhurip, Katapang, Kabupaten Bandung</p>
-                        <h3 style="margin-top: 8px; font-size: 12px; text-transform: uppercase; color: #0f766e;">BUKTI KAS / KWITANSI RESMI</h3>
+                        <h3 style="margin-top: 6px; font-size: 11px; text-transform: uppercase; color: #0f766e;">BUKTI KAS / KWITANSI RESMI #${idx + 1}</h3>
                     </div>
                     <div class="row"><span>ID: <b>${tx.id || '-'}</b></span> <span>Tanggal: <b>${tx.tanggal}</b></span></div>
                     <div class="row"><span>Jenis: <b>${tx.jenis}</b> | Rekening: <b>Kas ${tx.rekening}</b></span></div>
@@ -799,13 +833,8 @@
 
                     <div class="footer">
                         <div class="sign-box">
-                            <p>Mengetahui,</p>
-                            <p>Ketua DKM</p>
-                            <div class="sign-line">Ketua DKM</div>
-                        </div>
-                        <div class="sign-box">
                             <p>Disetujui,</p>
-                            <p>Bendahara</p>
+                            <p>Bendahara DKM</p>
                             <div class="sign-line">Bendahara</div>
                         </div>
                         <div class="sign-box">
@@ -815,83 +844,18 @@
                         </div>
                     </div>
                 </div>
+            `;
+        });
 
-                <!-- Kwitansi 2 -->
-                <div class="receipt-box">
-                    <div class="header">
-                        <h2>DKM JAMI AL-IKHLASH</h2>
-                        <p>Kp. Ciborerang, Desa Sangkanhurip, Katapang, Kabupaten Bandung</p>
-                        <h3 style="margin-top: 8px; font-size: 12px; text-transform: uppercase; color: #0f766e;">BUKTI KAS / KWITANSI RESMI (ARSIP BENDAHARA)</h3>
-                    </div>
-                    <div class="row"><span>ID: <b>${tx.id || '-'}</b></span> <span>Tanggal: <b>${tx.tanggal}</b></span></div>
-                    <div class="row"><span>Jenis: <b>${tx.jenis}</b> | Rekening: <b>Kas ${tx.rekening}</b></span></div>
-                    <div class="row"><span>Keterangan: <b>${tx.uraian}</b></span></div>
-                    
-                    <div class="amount-box">
-                        <span>Nominal Rupiah</span>
-                        <h3>Rp ${new Intl.NumberFormat('id-ID').format(tx.nominal)}</h3>
-                    </div>
-
-                    <div class="footer">
-                        <div class="sign-box">
-                            <p>Mengetahui,</p>
-                            <p>Ketua DKM</p>
-                            <div class="sign-line">Ketua DKM</div>
-                        </div>
-                        <div class="sign-box">
-                            <p>Disetujui,</p>
-                            <p>Bendahara</p>
-                            <div class="sign-line">Bendahara</div>
-                        </div>
-                        <div class="sign-box">
-                            <p>Bandung, ${new Date().toLocaleDateString('id-ID')}</p>
-                            <p>Sekretaris</p>
-                            <div class="sign-line">${window.operatorName}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kwitansi 3 -->
-                <div class="receipt-box">
-                    <div class="header">
-                        <h2>DKM JAMI AL-IKHLASH</h2>
-                        <p>Kp. Ciborerang, Desa Sangkanhurip, Katapang, Kabupaten Bandung</p>
-                        <h3 style="margin-top: 8px; font-size: 12px; text-transform: uppercase; color: #0f766e;">BUKTI KAS / KWITANSI RESMI (ARSIP SEKRETARIAT)</h3>
-                    </div>
-                    <div class="row"><span>ID: <b>${tx.id || '-'}</b></span> <span>Tanggal: <b>${tx.tanggal}</b></span></div>
-                    <div class="row"><span>Jenis: <b>${tx.jenis}</b> | Rekening: <b>Kas ${tx.rekening}</b></span></div>
-                    <div class="row"><span>Keterangan: <b>${tx.uraian}</b></span></div>
-                    
-                    <div class="amount-box">
-                        <span>Nominal Rupiah</span>
-                        <h3>Rp ${new Intl.NumberFormat('id-ID').format(tx.nominal)}</h3>
-                    </div>
-
-                    <div class="footer">
-                        <div class="sign-box">
-                            <p>Mengetahui,</p>
-                            <p>Ketua DKM</p>
-                            <div class="sign-line">Ketua DKM</div>
-                        </div>
-                        <div class="sign-box">
-                            <p>Disetujui,</p>
-                            <p>Bendahara</p>
-                            <div class="sign-line">Bendahara</div>
-                        </div>
-                        <div class="sign-box">
-                            <p>Bandung, ${new Date().toLocaleDateString('id-ID')}</p>
-                            <p>Sekretaris</p>
-                            <div class="sign-line">${window.operatorName}</div>
-                        </div>
-                    </div>
-                </div>
-
+        htmlContent += `
                 <script>
                     window.onload = function() { window.print(); window.close(); }
                 <\/script>
             </body>
             </html>
-        `);
+        `;
+
+        printWin.document.write(htmlContent);
         printWin.document.close();
     }
 
@@ -1119,7 +1083,9 @@
                     let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
                     saldoBerjalan += nIn; saldoBerjalan -= nOut;
 
-                    tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                    tbody.innerHTML += `<tr>
+                        <td class="no-print" style="width: 30px; text-align: center;"><input type="checkbox" class="print-kwitansi-cb" data-id="${tx.firebaseId}" style="width: 18px; height: 18px; cursor: pointer;"></td>
+                        <td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
                         <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                         <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                         <td class="no-print action-btns">
@@ -1161,7 +1127,9 @@
                     let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
                     saldoBerjalan += nIn; saldoBerjalan -= nOut;
 
-                    tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                    tbody.innerHTML += `<tr>
+                        <td class="no-print" style="width: 30px; text-align: center;"><input type="checkbox" class="print-kwitansi-cb" data-id="${tx.firebaseId}" style="width: 18px; height: 18px; cursor: pointer;"></td>
+                        <td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
                         <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                         <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                         <td class="no-print action-btns">
@@ -1184,7 +1152,9 @@
                 let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
                 saldoBerjalan += nIn; saldoBerjalan -= nOut;
 
-                tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                tbody.innerHTML += `<tr>
+                    <td class="no-print" style="width: 30px; text-align: center;"><input type="checkbox" class="print-kwitansi-cb" data-id="${tx.firebaseId}" style="width: 18px; height: 18px; cursor: pointer;"></td>
+                    <td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
                     <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                     <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                     <td class="no-print action-btns">
