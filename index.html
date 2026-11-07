@@ -69,6 +69,13 @@
         .btn-logout { background: #fef2f2; color: #ef4444; width: 42px; height: 42px; border-radius: 14px; border: none; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .btn-logout:hover { background: #fee2e2; }
 
+        /* --- REALTIME CLOUD STATUS BADGE --- */
+        .cloud-status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; margin-left: 8px; }
+        .cloud-status-badge.offline { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+        .cloud-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+        .cloud-status-badge.offline .cloud-dot { background: #ef4444; animation: none; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } 100% { opacity: 1; transform: scale(1); } }
+
         /* --- RUNNING TEXT --- */
         .marquee-container { width: 100%; background: #f1f5f9; border-radius: 10px; padding: 8px 12px; overflow: hidden; white-space: nowrap; position: relative; border-left: 3px solid var(--islamic-green-mint); }
         .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; font-size: 11px; font-weight: 700; color: var(--slate-dark); text-transform: uppercase; letter-spacing: 1px; }
@@ -181,11 +188,12 @@
             #tbody-bukukas td:nth-child(4)::before { content: 'Masuk: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
             #tbody-bukukas td:nth-child(5)::before { content: 'Keluar: '; color: var(--slate-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px;}
             #tbody-bukukas td:nth-child(6) { order: 5; margin-top: 15px; background: #f8fafc; padding: 15px !important; border-radius: 12px; text-align: center; font-weight: 800; font-size: 15px; color: var(--slate-dark); border: 1px solid #e2e8f0; } 
-            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 10px; } 
+            #tbody-bukukas td:nth-child(7) { order: 6; margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; } 
             
-            .btn-sm { padding: 12px; border-radius: 12px; border: none; color: white; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; }
+            .btn-sm { padding: 10px 12px; border-radius: 10px; border: none; color: white; cursor: pointer; font-size: 12px; font-weight: bold; flex: 1; display: flex; justify-content: center; align-items: center; gap: 5px; }
             .bg-red { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; } 
             .bg-blue { background: #f0f9ff; color: #0ea5e9; border: 1px solid #bae6fd; }
+            .bg-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
         }
 
         /* =========================================
@@ -224,10 +232,10 @@
             .spt-box h4 { border-bottom: 1px solid black !important; color: black !important; font-size: 14px !important; margin-bottom: 10px !important; padding-bottom: 5px !important; }
             .spt-row.total { color: black !important; border-top: 1px solid black !important; font-size: 14px !important; }
 
-            .print-footer { margin-top: 40px; display: flex !important; justify-content: flex-end !important; page-break-inside: avoid; }
-            .print-footer-box { text-align: center; width: 250px; }
+            .print-footer { margin-top: 40px; display: flex !important; justify-content: space-between !important; page-break-inside: avoid; }
+            .print-footer-box { text-align: center; width: 200px; }
             .print-footer-box p { font-size: 12px; margin: 3px 0; color: black; }
-            .signature-line { margin-top: 60px; font-weight: bold; text-decoration: underline; color: black; }
+            .signature-line { margin-top: 55px; font-weight: bold; text-decoration: underline; color: black; }
         }
     </style>
 </head>
@@ -254,7 +262,11 @@
                 <img src="logo_icon.png?v=2026" alt="Logo Masjid" class="header-logo-img">
                 <div class="header-text">
                     <h1>Kas Al-Ikhlash</h1>
-                    <p><i class="fa fa-cloud" style="color:var(--islamic-green-mint)"></i> <span id="display-operator">Cloud Firebase Realtime</span></p>
+                    <p>
+                        <i class="fa fa-cloud" style="color:var(--islamic-green-mint)"></i> 
+                        <span id="display-operator">Cloud Firebase Realtime</span>
+                        <span id="cloud-status-indicator" class="cloud-status-badge"><span class="cloud-dot"></span> Terhubung Cloud</span>
+                    </p>
                 </div>
             </div>
             <div class="header-actions">
@@ -386,7 +398,7 @@
                     </select>
                 </div>
 
-                <!-- Tambahan Kontrol Rentang Bulan -->
+                <!-- Kontrol Rentang Bulan -->
                 <div id="group-filter-rentang" style="display:none; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div>
                         <label style="font-size:10px; font-weight:700; color:var(--slate-muted);">Dari Bulan:</label>
@@ -412,6 +424,11 @@
                     <option value="Semua">Semua Rekening</option><option value="Umum">Kas Umum</option>
                     <option value="Soskem">Kas Sosial & Kematian</option><option value="Renovasi">Kas Renovasi</option>
                 </select>
+
+                <!-- FITUR PENCARIAN LIVE SEARCH -->
+                <div class="form-group" style="margin-top: 5px;">
+                    <input type="text" id="filter-search" placeholder="Cari uraian / keterangan transaksi..." oninput="generateBukuKas()" style="background: white;">
+                </div>
 
                 <button class="btn-action" onclick="generateBukuKas()"><i class="fa fa-search"></i> Tampilkan Rekapitulasi</button>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
@@ -458,8 +475,13 @@
 
         <div class="print-footer print-only">
             <div class="print-footer-box">
+                <p>Mengetahui,</p>
+                <p>Bendahara DKM</p>
+                <div class="signature-line">Bendahara</div>
+            </div>
+            <div class="print-footer-box">
                 <p>Dicetak tanggal: <span class="print-date-now"></span></p>
-                <p>Sekretaris / Operator</p>
+                <p>Sekretaris DKM</p>
                 <div class="signature-line print-operator-name">Sekretaris</div>
             </div>
         </div>
@@ -514,6 +536,11 @@
         </div>
 
         <div class="print-footer print-only">
+            <div class="print-footer-box">
+                <p>Mengetahui,</p>
+                <p>Bendahara DKM</p>
+                <div class="signature-line">Bendahara</div>
+            </div>
             <div class="print-footer-box">
                 <p>Dicetak tanggal: <span class="print-date-now"></span></p>
                 <p>Sekretaris DKM</p>
@@ -576,6 +603,18 @@
         }
     };
 
+    function updateCloudStatus(isConnected) {
+        let badge = document.getElementById('cloud-status-indicator');
+        if(!badge) return;
+        if(isConnected) {
+            badge.className = "cloud-status-badge";
+            badge.innerHTML = '<span class="cloud-dot"></span> Terhubung Cloud';
+        } else {
+            badge.className = "cloud-status-badge offline";
+            badge.innerHTML = '<span class="cloud-dot"></span> Offline Mode';
+        }
+    }
+
     function inisialisasiSistem() {
         let yearSel = document.getElementById('filter-tahun');
         let yearSptSel = document.getElementById('filter-tahun-spt');
@@ -592,8 +631,12 @@
             snapshot.forEach((docSnap) => {
                 window.dbKas.push({ firebaseId: docSnap.id, ...docSnap.data() });
             });
+            updateCloudStatus(true);
             renderDashboard();
             renderAdminChart();
+        }, (error) => {
+            updateCloudStatus(false);
+            console.error("Firebase sync error: ", error);
         });
 
         onSnapshot(collection(db, "audit"), (snapshot) => {
@@ -636,7 +679,7 @@
         if(saldo.Soskem < 0) issues.push("Saldo negatif pada Kas Soskem.");
         if(saldo.Renovasi < 0) issues.push("Saldo negatif pada Kas Renovasi.");
 
-        if(issues.length === 0) { alert("System Health Check (Firebase Cloud) : OK"); } 
+        if(issues.length === 0) { alert("System Health Check (Firebase Cloud) : OK - Terhubung Normal"); } 
         else { alert("Ditemukan " + issues.length + " masalah:\n- " + issues.join("\n- ")); }
     }
 
@@ -695,6 +738,75 @@
                 generateBukuKas();
             } catch(e) { alert("Gagal menghapus: " + e.message); }
         }
+    }
+
+    // FITUR CETAK KWITANSI INDIVIDUAL
+    window.cetakKwitansi = function(firebaseId) {
+        let tx = [...window.dbKas].find(t => t.firebaseId === firebaseId);
+        if(!tx) return;
+
+        let printWin = window.open('', '_blank');
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="id">
+            <head>
+                <meta charset="UTF-8">
+                <title>Kwitansi Transaksi - DKM Al-Ikhlash</title>
+                <style>
+                    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 30px; color: #0f172a; }
+                    .receipt-box { border: 2px solid #064e3b; padding: 25px; border-radius: 16px; max-width: 650px; margin: 0 auto; background: #fff; }
+                    .header { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; margin-bottom: 20px; }
+                    .header h2 { font-family: 'Cinzel', serif; color: #064e3b; margin: 0 0 5px 0; font-size: 20px; }
+                    .header p { font-size: 11px; color: #64748b; margin: 0; }
+                    .row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+                    .row b { color: #0f172a; }
+                    .amount-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 12px; margin: 20px 0; text-align: center; }
+                    .amount-box span { font-size: 11px; color: #166534; font-weight: bold; text-transform: uppercase; display: block; }
+                    .amount-box h3 { font-size: 24px; color: #15803d; margin: 5px 0 0 0; }
+                    .footer { margin-top: 40px; display: flex; justify-content: space-between; }
+                    .sign-box { text-align: center; width: 180px; }
+                    .sign-box p { font-size: 12px; margin: 3px 0; }
+                    .sign-line { margin-top: 60px; font-weight: bold; text-decoration: underline; }
+                </style>
+            </head>
+            <body>
+                <div class="receipt-box">
+                    <div class="header">
+                        <h2>DKM JAMI AL-IKHLASH</h2>
+                        <p>Kp. Ciborerang, Desa Sangkanhurip, Katapang, Kabupaten Bandung</p>
+                        <h3 style="margin-top: 15px; font-size: 16px; text-transform: uppercase; color: #0f766e;">BUKTI KAS / KWITANSI RESMI</h3>
+                    </div>
+                    <div class="row"><span>ID Transaksi:</span> <b>${tx.id || '-'}</b></div>
+                    <div class="row"><span>Tanggal:</span> <b>${tx.tanggal}</b></div>
+                    <div class="row"><span>Jenis Mutasi:</span> <b>${tx.jenis}</b></div>
+                    <div class="row"><span>Pos Rekening:</span> <b>Kas ${tx.rekening}</b></div>
+                    <div class="row"><span>Keterangan / Uraian:</span> <b>${tx.uraian}</b></div>
+                    
+                    <div class="amount-box">
+                        <span>Nominal Rupiah</span>
+                        <h3>Rp ${new Intl.NumberFormat('id-ID').format(tx.nominal)}</h3>
+                    </div>
+
+                    <div class="footer">
+                        <div class="sign-box">
+                            <p>Mengetahui,</p>
+                            <p>Bendahara</p>
+                            <div class="sign-line">Bendahara DKM</div>
+                        </div>
+                        <div class="sign-box">
+                            <p>Bandung, ${new Date().toLocaleDateString('id-ID')}</p>
+                            <p>Sekretaris</p>
+                            <div class="sign-line">${window.operatorName}</div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWin.document.close();
     }
 
     function renderDashboard() {
@@ -782,7 +894,6 @@
         setTimeout(() => { renderAdminChart(); }, 200);
     }
 
-    // Toggle tampilan kontrol filter berdasarkan mode rekapitulasi
     window.toggleFilterMode = function() {
         let mode = document.getElementById('filter-mode').value;
         let groupBulan = document.getElementById('group-filter-bulan');
@@ -804,7 +915,6 @@
         }
     }
 
-    // FUNGSI CETAK DIAGRAM KHUSUS DENGAN DESKRIPSI RINGKASAN
     window.cetakDiagramTransaksi = function() {
         let printWindow = window.open('', '_blank');
         let chartCanvas = document.getElementById('adminChartBar');
@@ -835,7 +945,7 @@
                     .txt-out { color: #ef4444; }
                     .chart-box { max-width: 750px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 15px; border-radius: 12px; }
                     img { width: 100%; height: auto; }
-                    .footer { margin-top: 40px; display: flex; justify-content: flex-end; }
+                    .footer { margin-top: 40px; display: flex; justify-content: space-between; }
                     .sign { text-align: center; width: 200px; }
                     .sign p { font-size: 12px; margin: 3px 0; }
                     .line { margin-top: 50px; border-bottom: 1px solid black; font-weight: bold; }
@@ -865,9 +975,14 @@
                 </div>
                 <div class="footer">
                     <div class="sign">
+                        <p>Mengetahui,</p>
+                        <p>Bendahara DKM</p>
+                        <div class="line">Bendahara</div>
+                    </div>
+                    <div class="sign">
                         <p>Dicetak pada: ${new Date().toLocaleDateString('id-ID')}</p>
                         <p>Sekretaris DKM</p>
-                        <div class="line">Sekretaris</div>
+                        <div class="line">${window.operatorName}</div>
                     </div>
                 </div>
                 <script>
@@ -882,6 +997,7 @@
     window.generateBukuKas = function() {
         let mode = document.getElementById('filter-mode').value;
         let fRek = document.getElementById('filter-rekening').value;
+        let fSearch = (document.getElementById('filter-search').value || "").toLowerCase();
         let sortedDB = [...window.dbKas].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
 
         let saldoAwal = 0, saldoBerjalan = 0;
@@ -906,6 +1022,7 @@
                 if(fRek !== 'Semua' && tx.rekening !== fRek) return;
                 let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
                 if(tY === fTahun && tM === fBulan) {
+                    if(fSearch && !tx.uraian.toLowerCase().includes(fSearch)) return;
                     hasData = true;
                     let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
                     let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
@@ -915,6 +1032,7 @@
                         <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                         <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                         <td class="no-print action-btns">
+                            <button class="btn-sm bg-purple" onclick="cetakKwitansi('${tx.firebaseId}')" title="Cetak Kwitansi"><i class="fa fa-receipt"></i> Nota</button>
                             <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
                             <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
                         </td></tr>`;
@@ -946,6 +1064,7 @@
                 let endValue = (fTahun * 12) + bulanSelesai;
 
                 if(txValue >= startValue && txValue <= endValue) {
+                    if(fSearch && !tx.uraian.toLowerCase().includes(fSearch)) return;
                     hasData = true;
                     let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
                     let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
@@ -955,6 +1074,7 @@
                         <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                         <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                         <td class="no-print action-btns">
+                            <button class="btn-sm bg-purple" onclick="cetakKwitansi('${tx.firebaseId}')" title="Cetak Kwitansi"><i class="fa fa-receipt"></i> Nota</button>
                             <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
                             <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
                         </td></tr>`;
@@ -967,6 +1087,7 @@
 
             sortedDB.forEach(tx => {
                 if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+                if(fSearch && !tx.uraian.toLowerCase().includes(fSearch)) return;
                 hasData = true;
                 let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
                 let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
@@ -976,6 +1097,7 @@
                     <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
                     <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
                     <td class="no-print action-btns">
+                        <button class="btn-sm bg-purple" onclick="cetakKwitansi('${tx.firebaseId}')" title="Cetak Kwitansi"><i class="fa fa-receipt"></i> Nota</button>
                         <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
                         <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
                     </td></tr>`;
