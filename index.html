@@ -190,7 +190,6 @@
 
         /* =========================================
            PENGATURAN KHUSUS CETAK PDF / KERTAS A4
-           (100% AMAN & TIDAK DIUBAH FORMAT LAPORANNYA)
            ========================================= */
         @media print {
             @page { size: A4 portrait; margin: 15mm; }
@@ -363,20 +362,58 @@
         </div>
 
         <div class="workspace-banking-card">
-            <div class="section-title no-print"><i class="fa fa-filter"></i> Filter Laporan</div>
+            <div class="section-title no-print"><i class="fa fa-filter"></i> Filter Laporan Rekapitulasi</div>
             <div class="filter-controls no-print">
-                <select id="filter-bulan">
-                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
-                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
-                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
-                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-                </select>
-                <select id="filter-tahun"></select>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:11px; font-weight:700; color:var(--slate-muted); margin-bottom:4px; display:block;">Mode Rekapitulasi</label>
+                    <select id="filter-mode" onchange="toggleFilterMode()">
+                        <option value="bulan">Per Bulan Tertentu</option>
+                        <option value="rentang">Rentang Bulan (Multi-Bulan)</option>
+                        <option value="semua">Semua Bulan / Keseluruhan</option>
+                    </select>
+                </div>
+
+                <div id="group-filter-tahun" style="display:grid; grid-template-columns: 1fr; gap:10px;">
+                    <select id="filter-tahun"></select>
+                </div>
+
+                <div id="group-filter-bulan" style="display:grid; grid-template-columns: 1fr; gap:10px;">
+                    <select id="filter-bulan">
+                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                        <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                        <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                        <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                </div>
+
+                <!-- Tambahan Kontrol Rentang Bulan -->
+                <div id="group-filter-rentang" style="display:none; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:10px; font-weight:700; color:var(--slate-muted);">Dari Bulan:</label>
+                        <select id="filter-bulan-mulai" style="margin-top:4px;">
+                            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                            <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:10px; font-weight:700; color:var(--slate-muted);">Sampai Bulan:</label>
+                        <select id="filter-bulan-selesai" style="margin-top:4px;">
+                            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                            <option value="10">Oktober</option><option value="11">November</option><option value="12" selected>Desember</option>
+                        </select>
+                    </div>
+                </div>
+
                 <select id="filter-rekening">
                     <option value="Semua">Semua Rekening</option><option value="Umum">Kas Umum</option>
                     <option value="Soskem">Kas Sosial & Kematian</option><option value="Renovasi">Kas Renovasi</option>
                 </select>
-                <button class="btn-action" onclick="generateBukuKas()"><i class="fa fa-search"></i> Tampilkan Data</button>
+
+                <button class="btn-action" onclick="generateBukuKas()"><i class="fa fa-search"></i> Tampilkan Rekapitulasi</button>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
                     <button class="btn-print" style="flex: 1;" onclick="cetakLaporan()"><i class="fa fa-file-pdf"></i> PDF</button>
                     <button class="btn-success" style="flex: 1;" onclick="exportCSV()"><i class="fa fa-file-excel"></i> CSV</button>
@@ -388,7 +425,7 @@
                 <button class="btn-teal" onclick="cetakDiagramTransaksi()"><i class="fa fa-chart-pie"></i> Cetak Diagram & Grafik Analitik</button>
             </div>
 
-            <!-- CONTAINER GRAFIK DIAGRAM (TAMPIL DI ADMIN & DAPAT DICETAK) -->
+            <!-- CONTAINER GRAFIK DIAGRAM -->
             <div class="chart-section-box">
                 <div class="section-title"><i class="fa fa-chart-bar"></i> Visualisasi Grafik Sirkulasi Kas</div>
                 <div class="chart-container-grid">
@@ -701,7 +738,6 @@
         if(!ctx) return;
         
         let monthsMap = {};
-        // Kumpulkan data dan kelompokkan berdasarkan key YYYY-MM agar bisa di-sort kronologis
         [...window.dbKas].forEach(tx => {
             let d = new Date(tx.tanggal);
             if(isNaN(d)) return;
@@ -716,7 +752,6 @@
             else if(tx.jenis === 'Keluar') monthsMap[sortKey].keluar += n;
         });
 
-        // Urutkan berdasarkan kunci waktu (kronologis dari yang terlama ke terbaru)
         let sortedKeys = Object.keys(monthsMap).sort();
         let labels = sortedKeys.map(k => monthsMap[k].label);
         let dataMasuk = sortedKeys.map(k => monthsMap[k].masuk);
@@ -747,13 +782,34 @@
         setTimeout(() => { renderAdminChart(); }, 200);
     }
 
+    // Toggle tampilan kontrol filter berdasarkan mode rekapitulasi
+    window.toggleFilterMode = function() {
+        let mode = document.getElementById('filter-mode').value;
+        let groupBulan = document.getElementById('group-filter-bulan');
+        let groupRentang = document.getElementById('group-filter-rentang');
+        let groupTahun = document.getElementById('group-filter-tahun');
+
+        if(mode === 'bulan') {
+            groupBulan.style.display = 'grid';
+            groupRentang.style.display = 'none';
+            groupTahun.style.display = 'grid';
+        } else if(mode === 'rentang') {
+            groupBulan.style.display = 'none';
+            groupRentang.style.display = 'grid';
+            groupTahun.style.display = 'grid';
+        } else if(mode === 'semua') {
+            groupBulan.style.display = 'none';
+            groupRentang.style.display = 'none';
+            groupTahun.style.display = 'none';
+        }
+    }
+
     // FUNGSI CETAK DIAGRAM KHUSUS DENGAN DESKRIPSI RINGKASAN
     window.cetakDiagramTransaksi = function() {
         let printWindow = window.open('', '_blank');
         let chartCanvas = document.getElementById('adminChartBar');
         let chartImageUrl = chartCanvas ? chartCanvas.toDataURL('image/png') : '';
         
-        // Hitung total keseluruhan untuk deskripsi ringkasan
         let totalMasukAll = 0;
         let totalKeluarAll = 0;
         [...window.dbKas].forEach(tx => {
@@ -824,31 +880,97 @@
     }
 
     window.generateBukuKas = function() {
-        let fBulan = parseInt(document.getElementById('filter-bulan').value); let fTahun = parseInt(document.getElementById('filter-tahun').value);
+        let mode = document.getElementById('filter-mode').value;
         let fRek = document.getElementById('filter-rekening').value;
         let sortedDB = [...window.dbKas].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
 
-        let saldoAwal = 0, inBulanIni = 0, outBulanIni = 0;
+        let saldoAwal = 0, saldoBerjalan = 0;
         let tbody = document.getElementById('tbody-bukukas'); tbody.innerHTML = '';
+        let hasData = false;
 
-        sortedDB.forEach(tx => {
-            if(fRek !== 'Semua' && tx.rekening !== fRek) return;
-            let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
-            if(tY < fTahun || (tY === fTahun && tM < fBulan)) {
-                if(tx.jenis === 'Masuk') saldoAwal += parseInt(tx.nominal);
-                if(tx.jenis === 'Keluar') saldoAwal -= parseInt(tx.nominal);
-            }
-        });
+        if (mode === 'bulan') {
+            let fBulan = parseInt(document.getElementById('filter-bulan').value); 
+            let fTahun = parseInt(document.getElementById('filter-tahun').value);
 
-        let saldoBerjalan = saldoAwal; let hasData = false;
-        
-        sortedDB.forEach(tx => {
-            if(fRek !== 'Semua' && tx.rekening !== fRek) return;
-            let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
-            if(tY === fTahun && tM === fBulan) {
+            sortedDB.forEach(tx => {
+                if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+                let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+                if(tY < fTahun || (tY === fTahun && tM < fBulan)) {
+                    if(tx.jenis === 'Masuk') saldoAwal += parseInt(tx.nominal);
+                    if(tx.jenis === 'Keluar') saldoAwal -= parseInt(tx.nominal);
+                }
+            });
+            saldoBerjalan = saldoAwal;
+
+            sortedDB.forEach(tx => {
+                if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+                let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+                if(tY === fTahun && tM === fBulan) {
+                    hasData = true;
+                    let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
+                    let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
+                    saldoBerjalan += nIn; saldoBerjalan -= nOut;
+
+                    tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                        <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
+                        <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
+                        <td class="no-print action-btns">
+                            <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
+                            <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
+                        </td></tr>`;
+                }
+            });
+        } 
+        else if (mode === 'rentang') {
+            let fTahun = parseInt(document.getElementById('filter-tahun').value);
+            let bulanMulai = parseInt(document.getElementById('filter-bulan-mulai').value);
+            let bulanSelesai = parseInt(document.getElementById('filter-bulan-selesai').value);
+
+            sortedDB.forEach(tx => {
+                if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+                let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+                let txValue = (tY * 12) + tM;
+                let startValue = (fTahun * 12) + bulanMulai;
+                if(txValue < startValue) {
+                    if(tx.jenis === 'Masuk') saldoAwal += parseInt(tx.nominal);
+                    if(tx.jenis === 'Keluar') saldoAwal -= parseInt(tx.nominal);
+                }
+            });
+            saldoBerjalan = saldoAwal;
+
+            sortedDB.forEach(tx => {
+                if(fRek !== 'Semua' && tx.rekening !== fRek) return;
+                let d = new Date(tx.tanggal); let tM = d.getMonth() + 1; let tY = d.getFullYear();
+                let txValue = (tY * 12) + tM;
+                let startValue = (fTahun * 12) + bulanMulai;
+                let endValue = (fTahun * 12) + bulanSelesai;
+
+                if(txValue >= startValue && txValue <= endValue) {
+                    hasData = true;
+                    let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
+                    let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
+                    saldoBerjalan += nIn; saldoBerjalan -= nOut;
+
+                    tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
+                        <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
+                        <td style="font-weight:bold;">Rp ${formatRp(saldoBerjalan)}</td>
+                        <td class="no-print action-btns">
+                            <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
+                            <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
+                        </td></tr>`;
+                }
+            });
+        } 
+        else if (mode === 'semua') {
+            saldoAwal = 0;
+            saldoBerjalan = 0;
+
+            sortedDB.forEach(tx => {
+                if(fRek !== 'Semua' && tx.rekening !== fRek) return;
                 hasData = true;
-                let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
-                inBulanIni += nIn; outBulanIni += nOut; saldoBerjalan += nIn; saldoBerjalan -= nOut;
+                let nIn = tx.jenis === 'Masuk' ? parseInt(tx.nominal) : 0; 
+                let nOut = tx.jenis === 'Keluar' ? parseInt(tx.nominal) : 0;
+                saldoBerjalan += nIn; saldoBerjalan -= nOut;
 
                 tbody.innerHTML += `<tr><td>${tx.tanggal}</td><td>${tx.uraian}</td><td class="col-rekening">${tx.rekening}</td>
                     <td class="txt-in">${nIn > 0 ? 'Rp ' + formatRp(nIn) : '-'}</td><td class="txt-out">${nOut > 0 ? 'Rp ' + formatRp(nOut) : '-'}</td>
@@ -857,10 +979,12 @@
                         <button class="btn-sm bg-blue" onclick="editTransaksiInit('${tx.firebaseId}')"><i class="fa fa-edit"></i> Edit</button>
                         <button class="btn-sm bg-red" onclick="hapusTransaksi('${tx.firebaseId}', ${tx.nominal})"><i class="fa fa-trash"></i> Hapus</button>
                     </td></tr>`;
-            }
-        });
+            });
+        }
+
         if(!hasData) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px !important;">Tidak ada data pada periode ini.</td></tr>`;
-        document.getElementById('buku-awal').innerText = 'Rp ' + formatRp(saldoAwal); document.getElementById('buku-akhir').innerText = 'Rp ' + formatRp(saldoBerjalan);
+        document.getElementById('buku-awal').innerText = 'Rp ' + formatRp(saldoAwal); 
+        document.getElementById('buku-akhir').innerText = 'Rp ' + formatRp(saldoBerjalan);
     }
 
     window.generateSPT = function() {
@@ -888,12 +1012,23 @@
 
     function setPrintMeta() {
         let mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        let fBulan = parseInt(document.getElementById('filter-bulan').value);
-        let fTahun = document.getElementById('filter-tahun').value;
+        let mode = document.getElementById('filter-mode').value;
         let fRek = document.getElementById('filter-rekening').value;
+        let fTahun = document.getElementById('filter-tahun').value;
         
         let elPeriode = document.getElementById('print-periode');
-        if(elPeriode) elPeriode.innerText = mNames[fBulan-1] + ' ' + fTahun;
+        if(elPeriode) {
+            if(mode === 'bulan') {
+                let fBulan = parseInt(document.getElementById('filter-bulan').value);
+                elPeriode.innerText = mNames[fBulan-1] + ' ' + fTahun;
+            } else if(mode === 'rentang') {
+                let mStart = parseInt(document.getElementById('filter-bulan-mulai').value);
+                let mEnd = parseInt(document.getElementById('filter-bulan-selesai').value);
+                elPeriode.innerText = mNames[mStart-1] + ' s.d. ' + mNames[mEnd-1] + ' ' + fTahun;
+            } else if(mode === 'semua') {
+                elPeriode.innerText = 'Semua Bulan (Keseluruhan Data)';
+            }
+        }
         
         let elRek = document.getElementById('print-rekening');
         if(elRek) elRek.innerText = fRek === 'Semua' ? 'Semua Buku' : ('Kas ' + fRek);
